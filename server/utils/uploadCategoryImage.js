@@ -32,22 +32,9 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const deleteCategoryImage = async(filename) => {
-  try {
-    const publicDir = path.join(__dirname, "..", "public//images//category");
-    const filepath = `${publicDir}\\${filename}`
-    if (fs.existsSync(filepath)) {
-        fs.unlinkSync(filepath)
-    }
-    console.log("Delete File successfully.");
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 const uploadCategoryImage = multer({ storage, fileFilter });
 
 module.exports = {
-  uploadCategoryImage,
-  deleteCategoryImage
+  uploadCategoryImage
 };

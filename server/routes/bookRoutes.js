@@ -15,7 +15,10 @@ router
         bookController.addBook
     )
     .patch(
-        // bookImageHandle.uploadBookImage.single('file'),
+        bookImageHandle.upload.fields([
+            { name: 'image', maxCount: 1 },
+            { name: 'epub', maxCount: 1 }
+          ]),
         bookController.updateBook
     )
     .delete(bookController.deleteBook);

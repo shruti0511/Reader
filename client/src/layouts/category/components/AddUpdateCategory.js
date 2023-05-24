@@ -86,17 +86,15 @@ const AddUpdateCategory = ({ close, status,category }) => {
             initialValues={status === "add"?{ name: "", image: "" }:{ name: category.name, image: "" }}
             validationSchema={Validation}
             onSubmit={async (values, { setSubmitting }) => {
-                let categoryData
+                let categoryData;
                 if (status === "add") {
-                    categoryData = values
-                }
-                else{
+                    categoryData = values;
+                } else {
                     categoryData = {
-                        id:category._id,
-                        ...values    
+                        id : category._id,
+                        ...values
                     }
                 }
-                
                 const data = new FormData();
                 for (var key in categoryData) {
                     data.append(key, categoryData[key]);

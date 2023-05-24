@@ -1,6 +1,7 @@
 const Category = require("../models/Category");
 const asyncHandler = require("express-async-handler");
-const categoryImageHandle = require("../utils/uploadCategoryImage")
+const categoryImageHandle = require("../utils/uploadCategoryImage");
+const deleteFile = require("../utils/deleteFile");
 
 // @desc get all categories
 // @route GET/categories
@@ -29,7 +30,7 @@ const addCategory = asyncHandler(async (req, res) => {
         const file = req.file;
         if (!name) {
             if (file) {
-                await categoryImageHandle.deleteCategoryImage(file.filename)
+                await deleteFile(file.filename,file.destination.replace('Public',''))
             }
             return res.status(400).json({ message: "Category Name is required", });
         }
@@ -37,7 +38,7 @@ const addCategory = asyncHandler(async (req, res) => {
         const duplicate = await Category.findOne({ name, }).lean().exec();
         if (duplicate) {
             if (file) {
-                await categoryImageHandle.deleteCategoryImage(file.filename)
+                await deleteFile(file.filename,file.destination.replace('Public',''))
             }
             return res.status(409).json({ message: "Category already exist!" });
         }
@@ -53,13 +54,13 @@ const addCategory = asyncHandler(async (req, res) => {
             res.status(200).json({ message: "Category successfully created", });
         } else {
             if (file) {
-                await categoryImageHandle.deleteCategoryImage(file.filename)
+                await deleteFile(file.filename,file.destination.replace('Public',''))
             }
             res.status(400).json({ message: "Invalid Category data received", });
         }
     } catch (error) {
         if (file) {
-            await categoryImageHandle.deleteCategoryImage(file.filename)
+            await deleteFile(file.filename,file.destination.replace('Public',''))
         }
         console.error("Error addCategory:", error);
         res.status(500).json({ message: "Failed to add category" });
@@ -77,16 +78,17 @@ const updateCategory = asyncHandler(async (req, res) => {
         //confirm data
         if (!id || !name) {
             if (file) {
-                await categoryImageHandle.deleteCategoryImage(file.filename)
+                await deleteFile(file.filename,file.destination.replace('Public',''))
             }
             res.status(400).json({ message: "Category name is required" });
         }
 
         const category = await Category.findById(id).exec();
         const old_img = category.image;
+        const old_imgPath = category.imagePath;
         if (!category) {
             if (file) {
-                await categoryImageHandle.deleteCategoryImage(file.filename)
+                await deleteFile(file.filename,file.destination.replace('Public',''))
             }
             res.status(400).json({ message: "Category not Found" });
         }
@@ -95,23 +97,24 @@ const updateCategory = asyncHandler(async (req, res) => {
         //Allow updates to the original user
         if (duplicate && duplicate._id.toString() !== id) {
             if (file) {
-                await categoryImageHandle.deleteCategoryImage(file.filename)
+                await deleteFile(file.filename,file.destination.replace('Public',''))
             }
             return res.status(409).json({ message: "Category already Exist!" });
         }
         category.name = name;
         category.image = file ? file.filename : category.image;
+        category.imagePath= file ? file.destination.replace('Public','') :category.imagePath
         //update category
         const updatedCategory = await category.save();
         if (file && old_img != updateCategory.image) {
             if (file) {
-                await categoryImageHandle.deleteCategoryImage(old_img)
+                await deleteFile(old_img,old_imgPath)
             }
         }
         res.status(200).json({ message: `${updatedCategory.name} successfully updated` });
     } catch (error) {
         if (file) {
-            await categoryImageHandle.deleteCategoryImage(file.filename)
+            await deleteFile(file.filename,file.destination.replace('Public',''))
         }
         console.error("Error updateCategory:", error);
         res.status(500).json({ message: "Failed to update category" });
@@ -129,12 +132,13 @@ const deleteCategory = asyncHandler(async (req, res) => {
         }
         const category = await Category.findById(id).exec();
         const image = category.image
+        const imagePath = category.imagePath
         if (!category) {
             return res.status(400).json({ message: " Category not found" });
         }
         const result = await category.deleteOne();
         if (image) {
-            await categoryImageHandle.deleteCategoryImage(image)
+            await deleteFile(image,imagePath)
         }
         res.json(`Category ${result.name} with Id ${result._id} deleted`);
     } catch (error) {

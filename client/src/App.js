@@ -134,7 +134,7 @@ export default function App() {
             <Sidenav
               color={sidenavColor}
               brand={brand}
-              brandName="Reader"
+              brandName="Adventure"
               routes={[...routes,...adminRoutes]}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
@@ -170,7 +170,7 @@ export default function App() {
           <Sidenav
             color={sidenavColor}
             brand={brand}
-            brandName="Reader"
+            brandName="Adventure"
             routes={isAdmin?[...routes,...adminRoutes]:[...routes]}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}

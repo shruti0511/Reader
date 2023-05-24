@@ -1,15 +1,17 @@
 const fs = require('fs');
+const path = require('path');
 
-const deleteFile = (filepath) => {
-    return new Promise((resolve, reject) => {
-            fs.unlink(filepath, (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
-    });
-};
+const deleteFile = async (filename,fileDestination) => {
+    try {
+      const uploadDir = path.join(__dirname, "..", `Public${fileDestination}`);
+      const filepath = `${uploadDir}\\${filename}`;
+      if (fs.existsSync(filepath)) {
+        fs.unlinkSync(filepath);
+      }
+      console.log("Delete Image successfully.");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
 module.exports = deleteFile;

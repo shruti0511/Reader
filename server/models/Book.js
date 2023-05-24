@@ -27,13 +27,20 @@ const bookSchema = new mongoose.Schema(
         type: Number,
         default:0
     },
-    year: {
-      type: Number,
+    publication_date: {
+      type: Date,
     },
     image: {
       type: String,
     },
+    imagePath: {
+      type: String,
+    },
     bookFile: {
+      type: String,
+      required: true,
+    },
+    bookFilePath: {
       type: String,
       required: true,
     },

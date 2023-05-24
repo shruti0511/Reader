@@ -174,7 +174,7 @@ function Category() {
                     />
                   );
                 })}
-              <Grid item xs={12} md={6} xl={3} xxl={2} onClick={openAddModal}>
+              <Grid item xs={12} md={6} xl={2} onClick={openAddModal}>
                 <PlaceholderCard
                   title={{ variant: "h5", text: "New Category" }}
                   sx={{ maxHeight: "250px" }}
