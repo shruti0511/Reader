@@ -134,8 +134,8 @@ export default function App() {
             <Sidenav
               color={sidenavColor}
               brand={brand}
-              brandName="Adventure"
-              routes={[...routes,...adminRoutes]}
+              brandName="Reader"
+              routes={isAdmin?adminRoutes:routes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
             />
@@ -152,7 +152,7 @@ export default function App() {
               path="*"
               element={
                 email ? (
-                  <Navigate to={isAdmin ? "/dashboard" : "/virtual-reality"} />
+                  <Navigate to={isAdmin ? "/dashboard" : "/home"} />
                 ) : (
                   <Navigate to="/authentication/sign-in" />
                 )
@@ -170,8 +170,8 @@ export default function App() {
           <Sidenav
             color={sidenavColor}
             brand={brand}
-            brandName="Adventure"
-            routes={isAdmin?[...routes,...adminRoutes]:[...routes]}
+            brandName="Reader"
+            routes={isAdmin?adminRoutes:routes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
@@ -194,7 +194,7 @@ export default function App() {
             path="*"
             element={
               email ? (
-                <Navigate to={isAdmin ? "/dashboard" : "/virtual-reality"} />
+                <Navigate to={isAdmin ? "/dashboard" : "/home"} />
               ) : (
                 <Navigate to="/authentication/sign-in" />
               )

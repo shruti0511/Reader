@@ -7,37 +7,84 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import categoryService from "services/categoryService";
 import PropTypes from "prop-types";
-import { Checkbox, FormControl, Grid, InputLabel, MenuItem, OutlinedInput, Select } from "@mui/material";
+import { CardMedia, Checkbox, FormControl, Grid, InputLabel, MenuItem, OutlinedInput, Select } from "@mui/material";
+import defaultCategory from "assets/images/default-images/defaultCategory.jpg";
 import bookService from "services/bookService";
-
+const SUPPORTED_FORMATS = [
+    "image/jpeg", "image/jpg", "image/png"
+];
 const AddBook = ({ status, closeModal, book }) => {
     const [isFree, setIsFree] = useState(false);
     const [categories, setCategories] = useState([]);
 
     const handleIsFree = () => setIsFree(!isFree);
-    const Validation = Yup.object().shape({
+    const addValidation = Yup.object().shape({
         title: Yup.string().required("Book Title is required"),
         author: Yup.string().required("Book Author is required"),
         description: Yup.string().required("Book Description is required"),
         category: Yup.string().required("Category is required"),
-        // image: Yup.mixed().test(
-        //     "fileType",
-        //     "Incorrect file type",
-        //     (file) => {
-        //         if (file) {
-        //             file && ["image/png", "image/jpg", "image/jpeg"].includes(file.type)
-        //         }
-        //         else {
-        //             return true;
-        //         }
-        //     }
-        // ),
+        image: Yup.mixed()
+            .test(
+                "fileFormat",
+                "Unsupported Format",
+                value => !value || (value => value && SUPPORTED_FORMATS.includes(value.type))
+            ),
+        price: Yup.string().when("isFree", {
+            is: false,
+            then: () => Yup.string()
+                .required("Price is Required")
+        }),
+        image: Yup.mixed().test("fileType", "Incorrect image type", (file) => {
+            if (file) {
+                return (
+                    file &&
+                    ["image/png", "image/jpg", "image/jpeg"].includes(file.type)
+                );
+            } else {
+                return true;
+            }
+        }
+        ),
         epub: Yup.mixed().required("Epub file is required").test(
             "fileType",
             "Incorrect Epub type",
             (file) =>
                 file && ["application/epub+zip"].includes(file.type)
         ),
+    });
+
+    const updateValidation = Yup.object().shape({
+        title: Yup.string().required("Book Title is required"),
+        author: Yup.string().required("Book Author is required"),
+        description: Yup.string().required("Book Description is required"),
+        category: Yup.string().required("Category is required"),
+        price: Yup.string().when("isFree", {
+            is: false,
+            then: () => Yup.string().required("Price is Required")
+        }),
+        image: Yup.mixed().test("fileType", "Incorrect image type", (file) => {
+            if (file) {
+                return (
+                    file &&
+                    ["image/png", "image/jpg", "image/jpeg"].includes(file.type)
+                );
+            } else {
+                return true;
+            }
+        }
+        ),
+        epub: Yup.mixed().test("fileType", "Incorrect epub file type", (file) => {
+            if (file) {
+                return (
+                    file &&
+                    ["application/epub+zip"].includes(file.type)
+                );
+            } else {
+                return true;
+            }
+        }
+        ),
+
     });
     const [error, setError] = useState("");
     const [categorySelect, setCategorySelect] = useState("");
@@ -93,7 +140,7 @@ const AddBook = ({ status, closeModal, book }) => {
                 // setEmailConfirmed(true)
                 if (response.status === 200) {
                     //setCategories(response.data);
-                    closeModal()
+                    closeModal(response.data?.message)
                 }
             })
             .catch((error) => {
@@ -123,7 +170,7 @@ const AddBook = ({ status, closeModal, book }) => {
             .then((response) => {
                 console.log(response.status);
                 if (response.status === 200) {
-                    closeModal()
+                    closeModal(response.data?.message)
                 }
             })
             .catch((error) => {
@@ -164,7 +211,7 @@ const AddBook = ({ status, closeModal, book }) => {
                     epub: "",
                 }
             }
-            validationSchema={Validation}
+            validationSchema={status === "add" ? addValidation : updateValidation}
             onSubmit={async (values, { setSubmitting }) => {
                 debugger
                 let bookData;
@@ -180,7 +227,7 @@ const AddBook = ({ status, closeModal, book }) => {
                 for (var key in bookData) {
                     data.append(key, bookData[key]);
                 }
-                 { status === "add" ? addBookFun(data) :updateBookFun(data)}
+                { status === "add" ? addBookFun(data) : updateBookFun(data) }
                 console.log(values);
             }}
         >
@@ -196,7 +243,7 @@ const AddBook = ({ status, closeModal, book }) => {
             }) => (
                 <>
                     <SoftBox component="form" role="form" onSubmit={handleSubmit}>
-                        <SoftTypography variant="h4">
+                        <SoftTypography variant="h4" sx={{mb:5}}>
                             {status === "add" ? 'Add Book' : 'Update Book'}
                         </SoftTypography>
                         {error && (
@@ -204,7 +251,23 @@ const AddBook = ({ status, closeModal, book }) => {
                                 {error}
                             </SoftTypography>
                         )}
+                        {/* {status !== "add" &&
+                        <CardMedia
+                        src={defaultCategory}
+                        component="img"
+                        title={'title'}
+                        sx={{
+                            //width: "100%",
+                            height: '150px',
+                            margin: 0,
+                            //boxShadow: ({ boxShadows: { md } }) => md,
+                            objectFit: "contain",
+                            objectPosition: "left",
+                        }}
+                    />
+                       } */}
                         <Grid container spacing={3}>
+
                             <Grid item xs={12} md={6} xl={6}>
                                 <SoftBox>
                                     <SoftBox mb={1} ml={0.5}>
@@ -368,6 +431,11 @@ const AddBook = ({ status, closeModal, book }) => {
                                                     onBlur={handleBlur}
                                                     value={values.price}
                                                 />
+                                                {errors.price && touched.price ? (
+                                                    <SoftTypography variant="caption" color="error">
+                                                        {errors.price}
+                                                    </SoftTypography>
+                                                ) : null}
                                             </Grid>
                                         }
                                     </Grid>

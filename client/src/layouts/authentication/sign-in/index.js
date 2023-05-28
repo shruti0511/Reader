@@ -38,6 +38,8 @@ import { setCredentials } from "redux/authSlice";
 import usePersist from "hooks/usePersist";
 import { Grid, Switch } from "@mui/material";
 import useAuth from "hooks/useAuth";
+import GoogleLogin from "react-google-login";
+import Socials from "../components/Socials";
 
 function SignIn() {
   const userRef = useRef();
@@ -111,6 +113,7 @@ function SignIn() {
           isSubmitting,
         }) => (
           <SoftBox component="form" role="form" onSubmit={handleSubmit}>
+            <Socials />
             <SoftBox mb={2}>
               <SoftBox mb={1} ml={0.5}>
                 <SoftTypography component="label" variant="caption" fontWeight="bold">

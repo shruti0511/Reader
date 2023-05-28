@@ -5,6 +5,7 @@ const path = require("path");
 const Category = require("../models/Category");
 const bookImageHandle = require("../utils/uploadBookImage");
 const deleteFile = require("../utils/deleteFile");
+const Rating = require("../models/Rating");
 
 // @desc get all books
 // @route GET/books
@@ -23,7 +24,14 @@ const getAllBook = asyncHandler(async (req, res) => {
               return { ...book, categoryName:category.name };
             })
           );
-        res.json(booksWithCategory);
+        const bookWithRatings = await Promise.all(
+            booksWithCategory.map(async (book) => {
+              const rating = await Rating.find({book:book._id}).lean().exec();
+              return { ...book, rating:rating };
+            })
+          );
+          console.log(bookWithRatings);
+        res.json(bookWithRatings);
     } catch (error) {
         console.error("Error getAllBook:", error);
         res.status(500).json({ message: "Failed to get all Book" });
@@ -228,15 +236,19 @@ const deleteBook = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: "Book required" });
         }
         const book = await Book.findById(id).exec();
-        const image = book.image
+        const {image,imagePath,bookFile, bookFilePath} = book
         if (!book) {
             return res.status(400).json({ message: " Book not found" });
         }
         const result = await book.deleteOne();
         if (image) {
-            await bookImageHandle.deleteBookImage(image)
+            await deleteFile(image, imagePath)
+
         }
-        res.json(`Book ${result.name} with Id ${result._id} deleted`);
+        if (bookFile) {
+            await deleteFile(bookFile, bookFilePath)
+        }
+        res.status(200).json({ message: `Book ${result.title} deleted` });
     } catch (error) {
         console.error("Error deleteBook:", error);
         res.status(500).json({ message: "Failed to delete Book" });

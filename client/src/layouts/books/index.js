@@ -15,7 +15,7 @@ import Table from "examples/Tables/Table";
 import authorsTableData from "layouts/books/component/authorsTableData";
 import projectsTableData from "layouts/books/component/projectsTableData";
 import SoftButton from "components/SoftButton";
-import { Modal, Box, CardContent, Grid } from "@mui/material";
+import { Modal, Box, CardContent, Grid, Alert, Collapse, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddBook from "./component/AddBook";
 import bookService from "services/bookService";
@@ -25,6 +25,7 @@ import SoftBadge from "components/SoftBadge";
 import defaultCategory from "assets/images/default-images/defaultCategory.jpg";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
 
 const style = {
     position: "absolute",
@@ -53,18 +54,22 @@ function Books() {
     const [books, setBooks] = useState([]);
     const [book, setBook] = useState({});
     const [status, setStatus] = useState("add")
+    const [alert, setAlert] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
 
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const closeModal = () => {
-        getBooks()
+    const closeModal = (message) => {
+        console.log(message, 'msg');
+        setAlert(true)
+        setSuccessMsg(message)
         handleClose()
     }
     useEffect(() => {
         getBooks()
-    }, [])
+    }, [successMsg])
 
     const openAddModal = () => {
         setBook({})
@@ -89,7 +94,7 @@ function Books() {
                         var publicationDate = new Date(item.publication_date)
                         return (
                             {
-                                title: (<Author image={imageSrc} name={item.title}  />),
+                                title: (<Author image={imageSrc} name={item.title} />),
                                 author: (<Function job={item.author} />),
                                 category: (
                                     <SoftBadge variant="gradient" badgeContent={item.categoryName} color="success" size="xs" container />
@@ -112,7 +117,7 @@ function Books() {
                                             onClick={() => { openUpdateModal(item) }}
                                         />
                                         <DeleteIcon color="error"
-                                         onClick={() => { deleteBookFun(item._id) }}
+                                            onClick={() => { deleteBookFun(item._id) }}
                                         />
                                     </SoftTypography>
                                 )
@@ -140,10 +145,11 @@ function Books() {
     };
 
     const deleteBookFun = (id) => {
-        bookService.deleteBook({id:id})
+        bookService.deleteBook({ id: id })
             .then((response) => {
                 if (response.status === 200) {
-                    getBooks()
+                    setAlert(true)
+                    setSuccessMsg(response.data?.message)
                 }
             })
             .catch((error) => {
@@ -170,7 +176,7 @@ function Books() {
                 <SoftBox mb={3}>
                     <Card>
                         <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-                            <SoftTypography variant="h6">Books {books.length}</SoftTypography>
+                            <SoftTypography variant="h6">Books</SoftTypography>
                             <SoftButton
                                 variant="gradient"
                                 color="secondary"
@@ -189,6 +195,27 @@ function Books() {
                                 },
                             }}
                         >
+                            <SoftBox display="flex" justifyContent="center" alignItems="center" p={3}>
+                                <Collapse in={alert}>
+                                    <Alert
+                                        action={
+                                            <IconButton
+                                                aria-label="close"
+                                                color="inherit"
+                                                size="small"
+                                                onClick={() => {
+                                                    setAlert(false);
+                                                }}
+                                            >
+                                                <CloseIcon fontSize="inherit" />
+                                            </IconButton>
+                                        }
+                                        sx={{ mb: 2,width:'1000px'}}
+                                    >
+                                       {successMsg? successMsg:"Task Complete successfully!"}
+                                    </Alert>
+                                </Collapse>
+                            </SoftBox>
                             <Table columns={columns} rows={books} />
                         </SoftBox>
                     </Card>

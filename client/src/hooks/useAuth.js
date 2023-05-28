@@ -18,6 +18,6 @@ const useAuth = () => {
         return { name, roles, status, email, isAdmin }
     }
 
-    return { name: '',email:'', roles: [],  isAdmin, status }
+    return { name: '',email:'', roles: [],  isAdmin, status ,token}
 }
 export default useAuth
