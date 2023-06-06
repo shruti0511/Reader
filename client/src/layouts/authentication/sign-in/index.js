@@ -1,18 +1,3 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useRef, useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -75,7 +60,7 @@ function SignIn() {
           {error}
         </SoftTypography>
       )}
-
+      <Socials />
       <Formik
         initialValues={{ email: "", password: "" }}
         validationSchema={Validation}
@@ -113,7 +98,7 @@ function SignIn() {
           isSubmitting,
         }) => (
           <SoftBox component="form" role="form" onSubmit={handleSubmit}>
-            <Socials />
+
             <SoftBox mb={2}>
               <SoftBox mb={1} ml={0.5}>
                 <SoftTypography component="label" variant="caption" fontWeight="bold">
@@ -227,7 +212,7 @@ function SignIn() {
                     fontWeight="medium"
                     textGradient
                   >
-                    Sign In
+                    Sign Up
                   </SoftTypography>
                 </SoftBox>
               </Grid>

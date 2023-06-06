@@ -19,4 +19,6 @@ router.route("/forgotPasword").post(authController.forgotPassword)
 
 router.route("/resetPasword").post(authController.resetPassword)
 
+router.route("/googlelogin").post(authController.googleLogin)
+
 module.exports = router;

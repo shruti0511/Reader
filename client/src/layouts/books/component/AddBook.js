@@ -213,7 +213,7 @@ const AddBook = ({ status, closeModal, book }) => {
             validationSchema={status === "add" ? addValidation : updateValidation}
             onSubmit={(values, { setSubmitting }) => {
                 console.log(values);
-                debugger
+
                 let bookData;
                 if (status === "add") {
                     bookData = values;

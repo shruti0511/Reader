@@ -1,34 +1,90 @@
-import { Grid } from '@mui/material'
-import React from 'react'
+import { Grid, Menu, MenuItem } from '@mui/material'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import SoftBox from 'components/SoftBox'
 import defaultCategory from "assets/images/default-images/defaultCategory.jpg"
 import SoftTypography from 'components/SoftTypography'
 import { useNavigate } from 'react-router-dom'
-
-const LibraryBook = ({ book }) => {
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import IconButton from '@mui/material/IconButton';
+const ITEM_HEIGHT = 48;
+const LibraryBook = ({ book,removeBookFromLibrary }) => {
     const navigate = useNavigate()
     var imageSrc = book.image ? process.env.REACT_APP_SERVER_API + book.imagePath + "/" + book.image : defaultCategory;
     const readBook = () => {
         navigate(`/reader/${book.bookFile}`, { state: { path: book.bookFilePath } })
     }
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        removeBookFromLibrary()
+        setAnchorEl(null);
+    };
     return (
         <>
             <Grid item xl={1.5} md={3} xs={12} sm={6}>
-                <SoftBox
-                    justifyContent="center"
-                    borderRadius="lg"
-                    m={1}
-                    onClick={readBook}
-                >
-                    <SoftBox component="img" src={imageSrc} alt="rocket" width="140px" sx={{ maxHeight: '200px', minHeight: '200px' }} />
-                    <SoftTypography variant="h5"  >
-                        {book.title}
-                    </SoftTypography>
-                    <SoftTypography variant="body2"  >
-                        {book.author}
-                    </SoftTypography>
+                <SoftBox display="flex" flexDirection="row" height="100%">
+
+                    <SoftBox
+                        justifyContent="center"
+                        borderRadius="lg"
+                        m={1}
+                        onClick={readBook}
+                    >
+                        <SoftBox component="img" src={imageSrc} alt="rocket" width="140px" sx={{ maxHeight: '200px', minHeight: '200px' }} />
+                        <SoftTypography variant="h5"  >
+                            {book.title}
+                        </SoftTypography>
+                        <SoftTypography variant="body2"  >
+                            {book.author}
+                        </SoftTypography>
+
+
+                    </SoftBox>
+                    <SoftBox
+                        // display="flex"
+                        // alignItem="flex-start"
+                        // justifyContent="flex-end"
+                        sx={{ top: 0 }}
+                    >
+                        <IconButton
+                            aria-label="more"
+                            id="long-button"
+                            aria-controls={open ? 'long-menu' : undefined}
+                            aria-expanded={open ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={handleClick}
+                        >
+                            <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                            id="long-menu"
+                            MenuListProps={{
+                                'aria-labelledby': 'long-button',
+                            }}
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            // PaperProps={{
+                            //     style: {
+                            //         maxHeight: ITEM_HEIGHT * 4.5,
+                            //         width: '20ch',
+                            //     },
+                            // }}
+                        >
+                            {/* {options.map((option) => ( */}
+                            <MenuItem key={1} onClick={handleClose}>
+                                Remove From Library
+                            </MenuItem>
+                            {/* ))} */}
+                        </Menu>
+                    </SoftBox>
+
                 </SoftBox>
+
 
             </Grid>
         </>
@@ -36,6 +92,7 @@ const LibraryBook = ({ book }) => {
 }
 LibraryBook.propTypes = {
     book: PropTypes.isRequired,
+    removeBookFromLibrary:PropTypes.func.isRequired
 };
 
 export default LibraryBook

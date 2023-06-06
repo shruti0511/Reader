@@ -14,25 +14,49 @@ Coded by www.creative-tim.com
 */
 
 // Soft UI Dashboard React components
-import SoftButton from "components/SoftButton";
 import SoftBox from "components/SoftBox";
 import { GoogleLogin } from "react-google-login";
+import usePersist from "hooks/usePersist";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useGoogleLoginMutation } from "redux/auth/authApiSlice";
+import { setCredentials } from "redux/authSlice";
+import { gapi } from "gapi-script";
 
 function Socials() {
+
+  const [googleLogin, { isLoading, isSuccess, isError, error }] =
+    useGoogleLoginMutation();
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [persist, setPersist] = usePersist();
+    const handleSetPersist = () => setPersist(!persist);
+
   const responseGoogleSuccess = async (response) => {
+
     try {
-      const result = await axios({
-        method: "POST",
-        url: "http://localhost:3500//googlelogin",
-        data: { idToken: response.tokenId },
-      });
-      console.log(result);
+      const code = response.code
+      const { accessToken } = await googleLogin({code}).unwrap();
+      dispatch(setCredentials({ accessToken }));
+      setPersist(true)
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      debugger;
+      if (!error.status) {
+        console.log("No Server Response");
+      } else if (error.status === 400) {
+        console.log("Missing Username or Password");
+      } else if (error.status === 401) {
+        console.log("Unauthorized");
+      } else {
+        console.log(error?.data?.message);
+      }
+      errRef.current.focus();
     }
   };
   const responseGoogleError = (response) => {
-    console.log(response);
+    console.log(response,'error');
   };
   return (
     <SoftBox display="flex" justifyContent="center">
@@ -61,11 +85,12 @@ function Socials() {
         </SoftButton>
       </SoftBox> */}
       <GoogleLogin
-        clientId="265511210397-aolug3hsqqki981drv2ce96emp4falqt.apps.googleusercontent.com"
-        buttonText="Login with google"
+        clientId={process.env.REACT_APP_PUBLIC_GOOGLE_CLIENT_ID}
+        buttonText="Sign In with google"
         onSuccess={responseGoogleSuccess}
         onFailure={responseGoogleError}
         cookiePolicy={"single_host_origin"}
+        responseType="code"
       />
       {/* <SoftButton variant="outlined" color="light">
         <svg width="24px" height="32px" viewBox="0 0 64 64" version="1.1">

@@ -9,7 +9,7 @@ const API_URL = "http://localhost:3500/";
 // };
 
 // const verifyUser = (data) => {
-//   debugger
+//
 //   return axios.post(API_URL + "auth/confirm",data).then((response) => {
 //     return response.data;
 //   });

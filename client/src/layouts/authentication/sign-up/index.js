@@ -1,21 +1,6 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useEffect, useState } from "react";
-import { Formik } from "formik"
-import * as Yup from 'yup';
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 // react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
@@ -41,37 +26,38 @@ import { useSignUpMutation } from "redux/auth/authApiSlice";
 
 function SignUp() {
   const [agreement, setAgremment] = useState(true);
-  const [successMsg, setSuccessMsg] = useState();
+  const [successMsg, setSuccessMsg] = useState("");
   // const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const [signUp, { isLoading, isSuccess, isError, error }] =
-    useSignUpMutation();
-
+  const [signUp, { isLoading, isSuccess, isError, error }] = useSignUpMutation();
 
   const handleSetAgremment = () => setAgremment(!agreement);
   const Validation = Yup.object().shape({
-    name: Yup.string().required('Name is Required'),
-    email: Yup.string().required('Email is Required').email("Enter Valid Email Id"),
-    password: Yup.string().required('Password is Required')
-      .min(8, 'Password is too short - should be 8 chars minimum.')
+    name: Yup.string().required("Name is Required"),
+    email: Yup.string().required("Email is Required").email("Enter Valid Email Id"),
+    password: Yup.string()
+      .required("Password is Required")
+      .min(8, "Password is too short - should be 8 chars minimum."),
   });
 
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/authentication/sign-in");
-    }
-  }, [isSuccess, navigate]);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     //navigate("/authentication/sign-in");
+  //     //console.log(success,'useffect');
+  //   }
+  // }, [isSuccess, navigate]);
 
   const register = async (data) => {
-    const { name, email, password } = data
+    const { name, email, password } = data;
     // e.preventDefault();
     // if (canSave) {
     const res = await signUp({ name, email, password });
-    console.log(res.data);
-    setSuccessMsg(res.data.messgae)
-
-  }
+    if (res.data) {
+      console.log(res?.data?.message, "res");
+      setSuccessMsg(res?.data?.message);
+    }
+  };
   return (
     <BasicLayout
       title="Welcome!"
@@ -83,26 +69,26 @@ function SignUp() {
           <SoftTypography variant="h5" fontWeight="medium">
             Register
           </SoftTypography>
-
         </SoftBox>
         <SoftBox mb={1}>
           <Socials />
         </SoftBox>
         <Separator />
         <SoftBox textAlign="center">
-          {
-            error != null &&
-            <SoftTypography variant="caption" color="error">{error}</SoftTypography>
-          }
-          {
-            successMsg != null &&
-            <SoftTypography variant="h6" color="success">{successMsg}</SoftTypography>
-          }
+          {isError && (
+            <SoftTypography variant="caption" color="error">
+              {error?.data?.message}
+            </SoftTypography>
+          )}
+          {isSuccess && (
+            <SoftTypography variant="h6" color="success">
+              {successMsg}
+            </SoftTypography>
+          )}
         </SoftBox>
         <SoftBox pt={2} pb={3} px={3}>
           <Formik
-
-            initialValues={{ name: '', email: '', password: '' }}
+            initialValues={{ name: "", email: "", password: "" }}
             validationSchema={Validation}
             onSubmit={(values, { setSubmitting }) => {
               register(values);
@@ -116,10 +102,8 @@ function SignUp() {
               handleBlur,
               handleSubmit,
               setFieldValue,
-              isSubmitting
+              isSubmitting,
             }) => (
-
-
               <SoftBox component="form" role="form" onSubmit={handleSubmit}>
                 <SoftBox mb={2}>
                   <SoftInput
@@ -128,8 +112,12 @@ function SignUp() {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     value={values.name}
-                  />{errors.name && touched.name ? (
-                    <SoftTypography variant="caption" color="error">{errors.name}</SoftTypography>) : null}
+                  />
+                  {errors.name && touched.name ? (
+                    <SoftTypography variant="caption" color="error">
+                      {errors.name}
+                    </SoftTypography>
+                  ) : null}
                 </SoftBox>
 
                 <SoftBox mb={2}>
@@ -142,7 +130,10 @@ function SignUp() {
                     value={values.email}
                   />
                   {errors.email && touched.email ? (
-                    <SoftTypography variant="caption" color="error">{errors.email}</SoftTypography>) : null}
+                    <SoftTypography variant="caption" color="error">
+                      {errors.email}
+                    </SoftTypography>
+                  ) : null}
                 </SoftBox>
 
                 <SoftBox mb={2}>
@@ -155,10 +146,10 @@ function SignUp() {
                     value={values.password}
                   />
                   {errors.password && touched.password ? (
-
-                    <SoftTypography variant="caption" color="error">{errors.password}</SoftTypography>
+                    <SoftTypography variant="caption" color="error">
+                      {errors.password}
+                    </SoftTypography>
                   ) : null}
-
                 </SoftBox>
                 <SoftBox display="flex" alignItems="center">
                   <Checkbox checked={agreement} onChange={handleSetAgremment} />
@@ -181,7 +172,7 @@ function SignUp() {
                   </SoftTypography>
                 </SoftBox>
                 <SoftBox mt={4} mb={1}>
-                  <SoftButton variant="gradient" color="dark" fullWidth type="submit" >
+                  <SoftButton variant="gradient" color="dark" fullWidth type="submit">
                     sign up
                   </SoftButton>
                 </SoftBox>
@@ -203,7 +194,6 @@ function SignUp() {
               </SoftBox>
             )}
           </Formik>
-
         </SoftBox>
       </Card>
     </BasicLayout>

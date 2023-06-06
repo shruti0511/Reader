@@ -21,7 +21,7 @@ const PersistLogin = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        debugger
+
         //if (effectRan.current === true || process.env.NODE_ENV !== 'development') { // React 18 Strict Mode
 
             const verifyRefreshToken = async () => {

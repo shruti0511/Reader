@@ -8,5 +8,6 @@ router
     .route("/")
     .get(libraryController.getUserLibrary)
     .post(libraryController.addLibrary)
+    .delete(libraryController.removeFromLibrary)
 
 module.exports = router;

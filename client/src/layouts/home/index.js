@@ -49,7 +49,6 @@ const HomePage = () => {
                 </Grid>
 
             </SoftBox>
-            {/* <Footer /> */}
         </DashboardLayout>
     )
 }

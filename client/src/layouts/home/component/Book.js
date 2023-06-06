@@ -43,7 +43,7 @@ const Book = ({ book }) => {
 
                             </Grid >
                             <Grid item xs={12} lg={6} xl={7} sx={{ position: "relative" }}>
-                                <SoftBox display="flex" flexDirection="column" height="100%">
+                                <SoftBox display="flex" flexDirection="column" height="100%" ml={1}>
                                     <SoftTypography variant="h4" fontWeight="bold" >
                                         {book.title}
                                     </SoftTypography>

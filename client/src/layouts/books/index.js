@@ -25,6 +25,9 @@ import defaultCategory from "assets/images/default-images/defaultCategory.jpg";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
+import InfoIcon from '@mui/icons-material/Info';
+import { useNavigate } from "react-router-dom";
+import Ratings from "layouts/component/Ratings";
 
 const style = {
     position: "absolute",
@@ -39,14 +42,14 @@ const style = {
     p: 4,
 };
 function Books() {
-    // const { columns, rows } = authorsTableData;
-    const { columns: prCols, rows: prRows } = projectsTableData;
+    const navigate = useNavigate()
     const columns = [
         { name: "title", align: "left" },
         { name: "author", align: "left" },
         { name: "category", align: "center" },
+        { name: "rating", align: "center" },
         { name: "price", align: "center" },
-        { name: "Publication_date", align: "center" },
+        { name: "Released Date", align: "center" },
         { name: "action", align: "center" },
     ]
     const [open, setOpen] = useState(false);
@@ -68,7 +71,7 @@ function Books() {
     }
     useEffect(() => {
         getBooks()
-    }, [successMsg,alert])
+    }, [successMsg, alert])
 
     const openAddModal = () => {
         setBook({})
@@ -89,7 +92,6 @@ function Books() {
                     const books = response.data
                     const rowData = books.map((item) => {
                         var imageSrc = item.image ? process.env.REACT_APP_SERVER_API + item.imagePath + "/" + item.image : defaultCategory;
-                        var description = item.description;
                         var publicationDate = new Date(item.publication_date)
                         return (
                             {
@@ -98,27 +100,35 @@ function Books() {
                                 category: (
                                     <SoftBadge variant="gradient" badgeContent={item.category.name} color="success" size="xs" container />
                                 ),
-                                Publication_date: (
+                                "Released Date": (
                                     <SoftTypography variant="caption" color="secondary" fontWeight="medium">
                                         {publicationDate.toLocaleDateString()}
                                     </SoftTypography>
+                                ),
+                                rating: (
+                                    <Ratings ratings={item.avgRating} showNumber={false} smallSize={true} />
                                 ),
                                 price: (
                                     <SoftTypography variant="caption">Rs. {item.price}</SoftTypography>
                                 ),
                                 action: (
-                                    <SoftTypography
-                                        variant="h5"
-                                        color="secondary"
-                                        fontWeight="medium"
-                                    >
-                                        <EditIcon color="info"
-                                            onClick={() => { openUpdateModal(item) }}
-                                        />
-                                        <DeleteIcon color="error"
-                                            onClick={() => { deleteBookFun(item._id) }}
-                                        />
-                                    </SoftTypography>
+                                    <>
+                                        <SoftBox display="flex" flexDirection="row" height="100%">
+                                            <SoftTypography mx={0.5} variant="h4">
+                                                <InfoIcon color="secondary"
+                                                    onClick={() => { navigate(`/bookDetail/${item._id}`) }}
+                                                />
+                                            </SoftTypography>
+                                            <SoftTypography mx={0.5} variant="h4">
+                                                <EditIcon color="info"
+                                                    onClick={() => { openUpdateModal(item) }}
+                                                /></SoftTypography>
+                                            <SoftTypography mx={0.5} variant="h4">
+                                                <DeleteIcon color="error"
+                                                    onClick={() => { deleteBookFun(item._id) }}
+                                                /></SoftTypography>
+                                        </SoftBox>
+                                    </>
                                 )
                             }
                         )

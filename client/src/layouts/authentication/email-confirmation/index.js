@@ -48,7 +48,7 @@ function EmailConfirmation() {
         // error is handled in catch block
         if (error.response) {
           // status code out of the range of 2xx
-          console.log("Data :" , error.response.data);
+          console.log("Data :", error.response.data);
           console.log("Status :" + error.response.status);
           if (error.response.status === 403) {
             setLinkExpired(true)
@@ -66,28 +66,28 @@ function EmailConfirmation() {
   };
 
   const reSendEmail = async (data) => {
-    const {email} =data
+    const { email } = data
     authService
-    .reSendEmail({ email })
+      .reSendEmail({ email })
       .then((response) => {
-      setSuccessMsg(response.data.message);
-      setErrorMsg();
-      setEmailResend(true)
-    })
-    .catch((error) => {
-      if (error.response) {
+        setSuccessMsg(response.data.message);
+        setErrorMsg();
+        setEmailResend(true)
+      })
+      .catch((error) => {
+        if (error.response) {
 
-         console.log("Data :" , error.response.data);
-        console.log("Status :" + error.response.status);
-        setErrorMsg(error.response.data.message)
-        setSuccessMsg();
+          console.log("Data :", error.response.data);
+          console.log("Status :" + error.response.status);
+          setErrorMsg(error.response.data.message)
+          setSuccessMsg();
 
-      } else if (error.request) {
-        console.log(error.request);
-      } else {
-        console.log("Error", error.message);
-      }
-    });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+      });
   }
 
   return (
@@ -101,7 +101,7 @@ function EmailConfirmation() {
         {/* <SoftBox  mb={1}>
         <Socials />
         </SoftBox> */}
-        {emailConfirmed || emailResend? (
+        {emailConfirmed || emailResend ? (
           <SoftBox textAlign="center">
             <SoftTypography variant="caption" color="success">
               {successMsg}, Click to{" "}
@@ -136,11 +136,9 @@ function EmailConfirmation() {
                   </SoftTypography>
                 )
                 // </SoftTypography>
-                }
-                {successMsg && (
-                  <SoftTypography
-                  //component={Link}
-                  //to="/authentication/sign-in"
+              }
+              {successMsg && (
+                <SoftTypography
                   variant="button"
                   color="success"
                   fontWeight="bold"
@@ -148,15 +146,15 @@ function EmailConfirmation() {
                 >
                   {successMsg}
                 </SoftTypography>
-                )}
+              )}
 
             </SoftBox>
             <SoftBox pt={2} pb={3} px={3}>
               <Formik
                 initialValues={{ name: "", email: "", password: "" }}
                 validationSchema={Validation}
-                  onSubmit={(values, { setSubmitting }) => {
-                  linkExpired ?reSendEmail(values):confirmEmail(values);
+                onSubmit={(values, { setSubmitting }) => {
+                  linkExpired ? reSendEmail(values) : confirmEmail(values);
 
                 }}
               >
@@ -189,7 +187,7 @@ function EmailConfirmation() {
 
                     <SoftBox mt={4} mb={1}>
                       <SoftButton variant="gradient" color="dark" fullWidth type="submit">
-                        { linkExpired?"Re-send confirmation Mail":"Confirm email"}
+                        {linkExpired ? "Re-send confirmation Mail" : "Confirm email"}
                       </SoftButton>
                     </SoftBox>
                     {/* <SoftBox mt={3} textAlign="center">

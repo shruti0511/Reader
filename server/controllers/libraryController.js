@@ -24,7 +24,7 @@ const getUserLibrary = asyncHandler(async (req, res) => {
 });
 
 
-// @desc create new rating
+// @desc add book in library
 // @route POST/rating
 // @access private
 const addLibrary = asyncHandler(async (req, res) => {
@@ -68,7 +68,32 @@ const addLibrary = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc remove book from library
+// @route POST/rating
+// @access private
+const removeFromLibrary = asyncHandler(async (req, res) => {
+    try {
+        const { id } = req.body
+        if (!id) {
+            return res.status(400).json({ message: "Data required" });
+        }
+        const library = await Library.findById(id).exec();
+        if (!library) {
+            return res.status(400).json({ message: " Data not found" });
+        }
+        const result = await library.deleteOne();
+
+        res.status(200).json({ message:`Book removed suceessfully from library` });
+
+    } catch (error) {
+
+        console.error("Error removeFromLibrary:", error);
+        res.status(500).json({ message: "Failed to remove book from library" });
+    }
+});
+
 module.exports = {
     getUserLibrary,
-    addLibrary
+    addLibrary,
+    removeFromLibrary
 };

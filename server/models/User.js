@@ -10,16 +10,14 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     password: {
-        type: String,
-        required: true
+        type: String
     },
     roles: [{
         type: String,
         default: "User"
     }],
     confirmationCode: {
-        type: String,
-        unique: true
+        type: String
     },
 
     active: {
@@ -34,6 +32,9 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
+    googleId: {
+        type: String
+    }
 
 }, {
     timestamps: true

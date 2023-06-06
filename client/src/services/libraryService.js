@@ -6,7 +6,10 @@ const libraryService = {
     },
     getUserLibrary: async() => {
         return await api.get(`/library`);
-      }
+  },
+  removeFromLibrary: async(data) => {
+    return await api.delete(`/library`,{ data: data });
+  }
   };
 
   export default libraryService;

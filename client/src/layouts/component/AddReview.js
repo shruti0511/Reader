@@ -1,62 +1,52 @@
-import {  Rating, TextField } from '@mui/material'
+import { Rating, TextField } from '@mui/material'
 import SoftBox from 'components/SoftBox';
 import SoftButton from 'components/SoftButton';
-import SoftTypography from 'components/SoftTypography'
 import Prototypes from 'prop-types'
 import React, { useState } from 'react'
 
-const AddReview = ({addReviewFun}) => {
-    const [ratingValue, setRatingValue] = useState(0);
+const AddReview = ({ addReviewFun }) => {
+    const [ratingValue, setRatingValue] = useState(null);
     const [review, setReview] = useState('');
-    const [error, setError] = useState('');
 
     const handleReviewchange = (e) => {
         setReview(e.target.value);
     }
 
     const submitReview = () => {
-        if (ratingValue == 0) {
-            setError('select your rating')
-        } else {
-            setError('')
-            setRatingValue(0)
+            setRatingValue(null)
             setReview('')
-            addReviewFun(ratingValue,review)
-        }
+            addReviewFun(ratingValue, review)
 
     }
 
     return (
         <>
-            <SoftTypography variant="body1" color="text" fontWeight="medium" mt={2}>
-                Add Your Review
-            </SoftTypography>
-
-                <Rating name="half-rating" value={ratingValue} precision={0.5}
+            <Rating
+                name="half-rating"
+                value={ratingValue}
+                precision={0.5}
+                size='large'
                 onChange={(event, newValue) => {
-                        if (newValue !== 0) {
-                            setError('')
-                        }
-                        setRatingValue(newValue);
-                    }}
+
+                    setRatingValue(newValue);
+                }}
             />
 
-
-            <SoftBox mb={1}>
-                <TextField
-                    multiline
-                    rows={3}
-                    onChange={handleReviewchange}
-                    value={review}
-                />
-            </SoftBox>
-            {error &&
-                <SoftBox mb={1}>
-                <SoftTypography variant="caption" color="error">
-                    {error}
-                </SoftTypography></SoftBox>
+            {ratingValue !== null &&
+                <>
+                    <SoftBox mb={1}>
+                        <TextField
+                            multiline
+                            rows={3}
+                            onChange={handleReviewchange}
+                        value={review}
+                        placeholder='Enter your review....'
+                        />
+                    </SoftBox>
+                <SoftButton m={1} color="info" onClick={submitReview}>Add Review</SoftButton>
+                </>
             }
-            <SoftButton m={1} color="info" onClick={submitReview}>Add Review</SoftButton>
+
         </>
     )
 }

@@ -76,9 +76,9 @@ const addRating = asyncHandler(async (req, res) => {
 const updateRating = asyncHandler(async (req, res) => {
     try {
 
-        const { id,rating,user,book,review } = req.body;
+        const { id,rating,review } = req.body;
         //confirm data
-        if (!id || !rating|| !user || !book) {
+        if (!id || !rating) {
 
             res.status(400).json({ message: "Fields are required" });
         }
@@ -88,19 +88,18 @@ const updateRating = asyncHandler(async (req, res) => {
 
             res.status(400).json({ message: "Rating not Found" });
         }
-        //check for duplicate
-        const duplicate = await Category.findOne({ book, user }).lean().exec();
         //Allow updates to the original user
-        if (duplicate && duplicate._id.toString() !== id) {
 
-            return res.status(409).json({ message: "Rating from user for this book already Exist!" });
-        }
         ratingData.rating = rating;
         ratingData.review = review;
         //update category
         const updatedRating = await ratingData.save();
+        if (updatedRating) {
+            res.status(200).json({ message: `rating/review successfully updated` });
+        } else {
+            res.status(400).json({ message: "Invalid Ratings data received", });
+        }
 
-        res.status(200).json({ message: `rating/review successfully updated` });
     } catch (error) {
 
         console.error("Error updateRating:", error);

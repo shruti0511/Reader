@@ -3,6 +3,9 @@ const asyncHandler = require("express-async-handler");
 const Category = require("../models/Category");
 const deleteFile = require("../utils/deleteFile");
 const Rating = require("../models/Rating");
+const Library = require("../models/Library");
+const User = require("../models/User");
+const {ObjectId} = require('mongodb');
 
 // @desc get all books
 // @route GET/books
@@ -21,8 +24,8 @@ const getAllBook = asyncHandler(async (req, res) => {
         }
         const bookWithRatings = await Promise.all(
             books.map(async (book) => {
-                const rating = await Rating.find({ book: book._id }).select("rating review").lean().exec();
-                const avgRating = rating.reduce((a, { rating }) => a + rating, 0) / rating.length
+                const ratings = await Rating.find({ book: book._id }).select("rating review").lean().exec();
+                const avgRating = ratings.reduce((a, { rating }) => a + rating, 0) / ratings.length
                 return { ...book, avgRating: !isNaN(avgRating) ? avgRating : 0 };
             })
         );
@@ -35,6 +38,7 @@ const getAllBook = asyncHandler(async (req, res) => {
 
 const getBook = asyncHandler(async (req, res) => {
     const id = req.params?.id
+    const userObj = await User.findOne({ email: req.user }).select('email').lean().exec();
     const book = await Book.findById(id).select().lean().populate({
         path: 'category',
         select:
@@ -45,13 +49,18 @@ const getBook = asyncHandler(async (req, res) => {
             message: "No Book Found",
         });
     }
-    const rating = await Rating.find({ book: book._id }).select("rating review").lean().populate({
+    const ratings = await Rating.find({ book: book._id }).lean().populate({
         path: 'user',
         select:
             'name',
     });
-    const avgRating = rating.reduce((a, { rating }) => a + rating, 0) / rating.length
-    const bookObj = { ...book, avgRating: !isNaN(avgRating) ? avgRating : 0, rating: rating }
+
+    const userRating = ratings.find(rating => rating.user._id.equals(userObj._id))
+
+    const otherRatings = ratings.filter(rating => !rating.user._id.equals(userObj._id))
+
+    const avgRating = ratings.reduce((a, { rating }) => a + rating, 0) / ratings.length
+    const bookObj = { ...book, avgRating: !isNaN(avgRating) ? avgRating : 0, ratings: otherRatings, userRating }
     res.json(bookObj);
 })
 
@@ -73,7 +82,6 @@ const addBook = asyncHandler(async (req, res) => {
 
         if (!epubFile) {
             if (imageFile) {
-                // await bookImageHandle.deleteBookImage(imageFile)
                 await deleteFile(imageFile, imageFile.destination.replace('Public', ''))
             }
             return res.status(400).json({ message: "Epub File Required", });
@@ -255,6 +263,11 @@ const deleteBook = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: " Book not found" });
         }
         const result = await book.deleteOne();
+        if (result) {
+
+            await Rating.deleteMany({ book: id });
+            await Library.deleteMany({ book: id });
+        }
         if (image) {
             await deleteFile(image, imagePath)
 

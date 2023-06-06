@@ -115,7 +115,7 @@ function Category() {
   }
 
   const openAddModal = () => {
-    debugger
+
     setStatus('add')
     handleOpen()
   }

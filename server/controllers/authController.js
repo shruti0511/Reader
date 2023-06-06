@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const nodemailer = require("../config/nodemailer.config");
+const googleOAuth = require('../utils/googleOAuth');
 
 // @desc SignUp
 // @route POST /signup
@@ -112,7 +113,7 @@ const login = asyncHandler(async (req, res) => {
     });
 
     // Send accessToken containing username and roles
-    res.status(200).json({ token:accessToken });
+    res.status(200).json({ token: accessToken });
 });
 
 // @desc Refresh
@@ -242,7 +243,7 @@ const forgotPassword = async (req, res) => {
     }
     const resetPasswordToken = jwt.sign({ email: user.email }, process.env.CONFIRMATION_SECRET, { expiresIn: '1m' });
     user.resetToken = resetPasswordToken;
-    user.resetTokenExpiration = Date.now() + 1 * 60 *1000
+    user.resetTokenExpiration = Date.now() + 1 * 60 * 1000
     user.save().then((result) => {
         const mailOptions = {
             from: process.env.MAIL_USER,
@@ -279,31 +280,124 @@ const resetPassword = async (req, res) => {
         res.status(401).json({ error: "Password and confirm PAssword not match" });
     }
     User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
-    .then((user) => {
-      if (!user) {
-        return res.status(401).json({ error: "Invalid or expired token" });
-      }
-      bcrypt
-        .hash(password, 10)
-        .then((hashedPassword) => {
-          user.password = hashedPassword;
-          user.resetToken = null;
-          user.resetTokenExpiration = null;
-          user.save().then(() => {
-            res.status(200).json({ message: "Password updated successfully" });
-          });
+        .then((user) => {
+            if (!user) {
+                return res.status(401).json({ error: "Invalid or expired token" });
+            }
+            bcrypt
+                .hash(password, 10)
+                .then((hashedPassword) => {
+                    user.password = hashedPassword;
+                    user.resetToken = null;
+                    user.resetTokenExpiration = null;
+                    user.save().then(() => {
+                        res.status(200).json({ message: "Password updated successfully" });
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.status(500).json({ error: "Internal server error" });
+                });
         })
         .catch((err) => {
-          console.log(err);
-          res.status(500).json({ error: "Internal server error" });
+            console.log(err);
+            res.status(500).json({ error: "Internal server error" });
         });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ error: "Internal server error" });
-    });
 
 }
+const googleLogin = async (req, res) => {
+    try {
+        const { code } = req.body;
+        const profile = await googleOAuth.getProfileInfo(code);
+
+        const userData = {
+            googleId: profile.sub,
+            name: profile.name,
+            firstName: profile.given_name,
+            lastName: profile.family_name,
+            email: profile.email,
+            profilePic: profile.picture,
+        };
+        User.findOne({ googleId: userData.googleId }).then(user => {
+            if (user) {
+                // Create JWT payload
+                const accessToken = jwt.sign(
+                    {
+                        UserInfo: {
+                            name: user.name,
+                            email: user.email,
+                            roles: user.roles,
+                        },
+                    },
+                    process.env.ACCESS_TOKEN_SECRET,
+                    { expiresIn: "15m" }
+                );
+
+                const refreshToken = jwt.sign(
+                    { email: user.email },
+                    process.env.REFRESH_TOKEN_SECRET,
+                    { expiresIn: "1d" }
+                );
+
+                // Create secure cookie with refresh token
+                res.cookie("jwt", refreshToken, {
+                    httpOnly: true, //accessible only by web server
+                    secure: true, //https
+                    sameSite: "None", //cross-site cookie
+                    maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
+                });
+                res.status(200).json({ token: accessToken });
+            } else {
+                const newUser = new User({
+                    googleId: userData.googleId,
+                    name:userData.name,
+                    email: userData.email,
+                    roles: ["User"],
+                    active:true
+
+                });
+
+                newUser
+                    .save()
+                    .then(user => {
+                        // Create JWT payload
+                        const accessToken = jwt.sign(
+                            {
+                                UserInfo: {
+                                    name: user.name,
+                                    email: user.email,
+                                    roles: user.roles,
+                                },
+                            },
+                            process.env.ACCESS_TOKEN_SECRET,
+                            { expiresIn: "15m" }
+                        );
+
+                        const refreshToken = jwt.sign(
+                            { email: user.email },
+                            process.env.REFRESH_TOKEN_SECRET,
+                            { expiresIn: "1d" }
+                        );
+
+                        // Create secure cookie with refresh token
+                        res.cookie("jwt", refreshToken, {
+                            httpOnly: true, //accessible only by web server
+                            secure: true, //https
+                            sameSite: "None", //cross-site cookie
+                            maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
+                        });
+                        res.status(200).json({ token: accessToken });
+                    })
+                    .catch(err => console.log(err));
+            }
+        });
+
+    } catch (e) {
+        console.log(e);
+        res.status(401).send();
+    }
+}
+
 
 module.exports = {
     signup,
@@ -313,5 +407,6 @@ module.exports = {
     confirmationEmail,
     reSendEmail,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    googleLogin
 };
