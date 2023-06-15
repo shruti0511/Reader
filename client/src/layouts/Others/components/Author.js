@@ -1,5 +1,5 @@
 
-import { Alert, Card, Collapse, IconButton, Stack, Tooltip } from '@mui/material';
+import { Alert, Button, Card, CardContent, Collapse, IconButton, Modal, Stack, Tooltip } from '@mui/material';
 import SoftBox from 'components/SoftBox';
 import SoftTypography from 'components/SoftTypography';
 import Table from 'examples/Tables/Table';
@@ -11,9 +11,25 @@ import AddUpdateAuthor from './AddUpdateAuthor'
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
+import InfoIcon from '@mui/icons-material/Info';
 import EditIcon from '@mui/icons-material/Edit';
 import SoftAvatar from 'components/SoftAvatar';
 import defaultBookImage from "assets/images/default-images/defaultBookImage.jpg";
+import BookList from 'layouts/category/components/BookList';
+
+
+const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 1000,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    borderRadius: "10px",
+    boxShadow: 24,
+    p: 4,
+};
 
 const Author = () => {
     // const { columns, rows } = data();
@@ -21,6 +37,7 @@ const Author = () => {
         { name: "name", align: "left" },
         { name: "description", align: "left" },
         { name: "books", align: "left" },
+        { name: "listButton", align: "left" },
         { name: "action", align: "center" },
     ]
 
@@ -28,6 +45,11 @@ const Author = () => {
     const [open, setOpen] = useState(false);
     const [status, setStatus] = useState('add')
     const [author, setAuthor] = useState();
+
+
+    const [openModal, setOpenModal] = useState(false);
+    const [authorName, setAuthorName] = useState("")
+    const [authorBookList, setAuthorBookList] = useState([]);
 
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -71,6 +93,12 @@ const Author = () => {
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const handleOpenModal = (author, books) => {
+        setAuthorBookList(books)
+        setAuthorName(author)
+        setOpenModal(true)
+    };
+    const handleCloseModal = () => setOpenModal(false);
     const [alert, setAlert] = useState(false);
     const [successMsg, setSuccessMsg] = useState("");
 
@@ -123,10 +151,10 @@ const Author = () => {
     const avatars = (item) => {
         return (
             <Tooltip title={item.title} placeholder="bottom">
-                 <SoftAvatar
+                <SoftAvatar
                     src={item.image ? process.env.REACT_APP_SERVER_API + item.imagePath + "/" + item.image : defaultBookImage}
                     alt={item.title}
-                    size="sm"
+                    size="xs"
                     sx={{
                         border: ({ borders: { borderWidth }, palette: { white } }) =>
                             `${borderWidth[2]} solid ${white.main}`,
@@ -176,26 +204,50 @@ const Author = () => {
                                 books: (
                                     <SoftBox display="flex" py={1}>
                                         {item.books &&
-                                            item.books.map((item, index)=>avatars(item))
+                                            item.books.slice(0, 4).map((item, index) => avatars(item))
                                         }
                                         {/* {item.books.length != 0 &&
                                         avatars(item.books)
                                         } */}
                                     </SoftBox>
                                 ),
+                                listButton:
+                                    (
+                                        // <>
+                                        //     {
+                                                item.books.length > 0 ?
+                                                    <SoftButton
+                                                        sx={{ textTransform: 'none' }}
+                                                        size="small"
+                                                        variant="outlined"
+                                                        onClick={() => { handleOpenModal(item.name,item.books) }}
+                                                        color="secondary"
+                                                    >
+                                                        BookList
+                                                    </SoftButton>
+                                                    :
+                                                    <>
+
+                                                    </>
+                                        //     }
+
+                                        // </>
+                                    )
+                                ,
                                 action: (
                                     <>
                                         <SoftBox display="flex" flexDirection="row" height="100%">
-                                            {/* <SoftTypography mx={0.5} variant="h4">
+                                            {/* <SoftTypography mx={0.5} variant="h6">
                                                 <InfoIcon color="secondary"
-                                                    onClick={() => { navigate(`/bookDetail/${item._id}`) }}
+                                                    onClick={() => { handleOpenModal(item.name,item.books) }}
                                                 />
                                             </SoftTypography> */}
-                                            <SoftTypography mx={0.5} variant="h4">
+
+                                            <SoftTypography mx={0.5} variant="h6">
                                                 <EditIcon color="info"
                                                     onClick={() => { onUpdateClick(item) }}
                                                 /></SoftTypography>
-                                            <SoftTypography mx={0.5} variant="h4">
+                                            <SoftTypography mx={0.5} variant="h6">
                                                 <DeleteIcon color="error"
                                                     onClick={() => { onDeleteClick(item._id) }}
                                                 /></SoftTypography>
@@ -315,7 +367,26 @@ const Author = () => {
                     </Stack>
             }
 
+            <Modal
+                open={openModal}
+                onClose={handleCloseModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <SoftBox sx={style} display="flex" flexDirection="column" justifyContent="space-between">
+                    <SoftTypography id="modal-modal-title" variant="h4" >
+                        {authorName}
+                        <Button onClick={handleCloseModal} sx={{ float: 'right' }}>x</Button>
+                    </SoftTypography>
 
+                    <Card variant="outlined">
+                        <CardContent>
+                            {/* <AddUpdateCategory close={addCategorySuccess} status={status} category={category} /> */}
+                            <BookList books={authorBookList} />
+                        </CardContent>
+                    </Card>
+                </SoftBox>
+            </Modal>
         </Card>
     );
 }

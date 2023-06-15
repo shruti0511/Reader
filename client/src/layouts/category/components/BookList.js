@@ -33,7 +33,7 @@ const BookList = ({ books }) => {
                 <ListItemAvatar>
                     <Avatar alt={book.title} src={imageSrc} />
                 </ListItemAvatar>
-                <ListItemText primary={book.title} secondary={book.author.name} />
+                <ListItemText primary={book.title} secondary={book?.author?.name} />
               </ListItem>
               )
 

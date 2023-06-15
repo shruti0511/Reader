@@ -155,11 +155,11 @@ const Language = () => {
                                                     onClick={() => { navigate(`/bookDetail/${item._id}`) }}
                                                 />
                                             </SoftTypography> */}
-                                            <SoftTypography mx={0.5} variant="h4">
+                                            <SoftTypography mx={0.5} variant="h6">
                                                 <EditIcon color="info"
                                                     onClick={() => { onUpdateClick(item) }}
                                                 /></SoftTypography>
-                                            <SoftTypography mx={0.5} variant="h4">
+                                            <SoftTypography mx={0.5} variant="h6">
                                                 <DeleteIcon color="error"
                                                     onClick={() => { onDeleteClick(item._id) }}
                                                 /></SoftTypography>
