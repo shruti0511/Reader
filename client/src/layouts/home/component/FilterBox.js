@@ -89,7 +89,7 @@ const FilterBox = ({ filterBooks, resetBooks }) => {
         resetBooks()
     }
     return (
-        <SoftBox display="flex" flexDirection="row" height="100%" m={4}>
+        <SoftBox display="flex" flexDirection="row" height="100%" >
 
             <FormControl sx={{ m: 1, width: 300 }} variant="outlined">
                 {/* <InputLabel id="demo-multiple-name-label">Select Author</InputLabel> */}

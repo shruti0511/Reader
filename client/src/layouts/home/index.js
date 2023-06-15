@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import bookService from 'services/bookService'
 import Book from './component/Book'
 import FilterBox from './component/FilterBox'
+import SerachBox from './component/SerachBox'
 
 const HomePage = () => {
     const [books, setBooks] = useState([]);
@@ -64,14 +65,23 @@ const HomePage = () => {
 
     }
     const resetBooks = () => {
-        console.log('yeah');
         getBooks()
     }
+
+    const onChangeSerchKey = (e) => {
+        const serachKey = e.target.value
+        const serchedData = allBooks.filter(i => i.title.toLowerCase().includes(serachKey.toLowerCase()))
+        setBooks(serchedData)
+    }
+
     return (
         <DashboardLayout>
             <DashboardNavbar navTitle="Home"/>
             <SoftBox py={3}>
+            <SoftBox display="flex" flexDirection="row" justifyContent="space-between" m={4}>
                 <FilterBox filterBooks={filterBooks} resetBooks={resetBooks} />
+                    <SerachBox onChangeSerchKey={onChangeSerchKey}  />
+                    </SoftBox>
                 <Grid container spacing={3}>
                     {books && books.map((book, index) => {
                         return <Book key={index} book={book} />

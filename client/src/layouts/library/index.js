@@ -5,9 +5,11 @@ import React, { useEffect, useState } from 'react'
 import libraryService from 'services/libraryService'
 import LibraryBook from './component/LibraryBook'
 import SoftBox from 'components/SoftBox'
+import SerachBox from 'layouts/home/component/SerachBox'
 
 const MyLibrary = () => {
     const [myBooks, setMyBooks] = useState([]);
+    const [myAllBooks, setMyAllBooks] = useState([]);
 
     useEffect(() => {
         getLibraryData()
@@ -19,6 +21,8 @@ const MyLibrary = () => {
             .then((response) => {
                 if (response.status === 200) {
                     setMyBooks(response.data)
+                    setMyAllBooks(response.data)
+
                 }
             })
             .catch((error) => {
@@ -62,10 +66,23 @@ const MyLibrary = () => {
                 }
             });
     }
+
+    const onChangeSerchKey = (e) => {
+        const serachKey = e.target.value
+        const serchedData = myAllBooks.filter(i => i.book.title.toLowerCase().includes(serachKey.toLowerCase()))
+        setMyBooks(serchedData)
+    }
     return (
         <DashboardLayout>
-            <DashboardNavbar navTitle="Library"/>
-
+            <DashboardNavbar navTitle="Library" />
+            <SoftBox
+                display="flex"
+                justifyContent="flex-end"
+                alignItems="center"
+                mr={10}
+            >
+                <SerachBox onChangeSerchKey={onChangeSerchKey} />
+            </SoftBox>
             {
                 myBooks.length !== 0 ?
                     <Grid container>

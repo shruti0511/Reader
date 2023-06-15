@@ -1,4 +1,3 @@
-
 import { Alert, Button, Card, Collapse, IconButton, Stack } from '@mui/material';
 import SoftBox from 'components/SoftBox';
 import SoftTypography from 'components/SoftTypography';
@@ -277,8 +276,6 @@ const Language = () => {
                         No Languages Added
                     </Stack>
             }
-
-
         </Card>
     );
 }

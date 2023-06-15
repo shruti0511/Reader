@@ -35,14 +35,10 @@ const getAuthorsWithbook = asyncHandler(async (req, res) => {
         const authorsWithbooks = await Promise.all(
             authors.map(async (author) => {
                 const books = await Book.find({ author: author._id }).select("title image imagePath").sort('-createdAt').lean().exec();
-                //     .populate({
-                //         path: 'author',
-                //         select:
-                //             'name',
-                //     }
-                // );
-
-                return { ...author,books:books};
+                return {
+                    ...author,
+                    books: books
+                };
             })
         );
         res.json(authorsWithbooks);
