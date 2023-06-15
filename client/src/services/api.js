@@ -1,22 +1,36 @@
 import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { selectCurrentToken } from 'redux/authSlice';
 import { store } from 'redux/store';
+import jwtDecode from 'jwt-decode';
+import { setCredentials } from 'redux/authSlice';
 
 const api = axios.create({
-  baseURL:  process.env.REACT_APP_SERVER_API,
+  baseURL: process.env.REACT_APP_SERVER_API,
+  withCredentials: true
 });
-
-// const token = useSelector(selectCurrentToken)
-// api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-// Modify the above line based on how you store your token (localStorage, Redux store, etc.)
-// const instance = axios.create({
-//     baseURL: "base_url",
 //   });
+const refreshToken = async () => {
+  try {
+    const res = await axios.get(process.env.REACT_APP_SERVER_API+"/auth/refresh",{withCredentials:true});
+    const { accessToken } = res.data
+    store.dispatch(setCredentials({ accessToken }))
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-api.interceptors.request.use(function (config) {
-    const token = store.getState().auth.token
-      config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  async (config)=> {
+  const user = store.getState().auth
+  let currentDate = new Date();
+    const decodedToken = jwtDecode(user.token);
+    if (decodedToken.exp * 1000 < currentDate.getTime()) {
+      const data = await refreshToken();
+      config.headers["authorization"] = "Bearer " + data.accessToken;
+    }
+    else {
+      config.headers.Authorization = `Bearer ${user.token}`;
+    }
       return config;
   });
 export default api;

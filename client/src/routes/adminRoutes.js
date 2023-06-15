@@ -1,10 +1,10 @@
-// Soft UI Dashboard React layouts
-import Tables from "layouts/tables";
-
 // Soft UI Dashboard React icons
 import Office from "examples/Icons/Office";
-import Category from "layouts/category";
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import CategoryIcon from '@mui/icons-material/Category';
 import Books from "layouts/books";
+import Category from "layouts/category";
+import Other from "layouts/Others";
 
 const adminRoutes = [
   {
@@ -12,25 +12,25 @@ const adminRoutes = [
     name: "Books",
     key: "books",
     route: "/books",
-    icon: <Office size="12px" />,
+    icon: <LibraryBooksIcon size="12px" />,
     component: <Books />,
     noCollapse: true,
   },
-  // {
-  //   type: "collapse",
-  //   name: "Tables",
-  //   key: "tables",
-  //   route: "/tables",
-  //   icon: <Office size="12px" />,
-  //   component: <Tables />,
-  //   noCollapse: true,
-  // },
+  {
+    type: "collapse",
+    name: "others",
+    key: "others",
+    route: "/others",
+    icon: <Office size="12px" />,
+    component: <Other />,
+    noCollapse: true,
+  },
   {
     type: "collapse",
     name: "Category",
     key: "category",
     route: "/category",
-    icon: <Office size="12px" />,
+    icon: <CategoryIcon size="12px" />,
     component: <Category />,
     noCollapse: true,
   },

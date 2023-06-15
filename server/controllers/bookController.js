@@ -5,18 +5,32 @@ const deleteFile = require("../utils/deleteFile");
 const Rating = require("../models/Rating");
 const Library = require("../models/Library");
 const User = require("../models/User");
-const {ObjectId} = require('mongodb');
+const { ObjectId } = require('mongodb');
+const Author = require("../models/Author");
+const Language = require("../models/Language");
 
 // @desc get all books
 // @route GET/books
 // @access private
 const getAllBook = asyncHandler(async (req, res) => {
     try {
-        const books = await Book.find().select().lean().populate({
-            path: 'category',
-            select:
-                'name',
-        });
+        const books = await Book.find().select().sort('-createdAt').lean().populate(
+            [{
+                path: 'category',
+                select:
+                    'name',
+            }, {
+                path: 'author',
+                select:
+                    'name',
+            },
+            {
+                path: 'language',
+                select:
+                    'name',
+            }
+            ]
+        );
         if (!books) {
             return res.status(400).json({
                 message: "No Books Found",
@@ -39,11 +53,23 @@ const getAllBook = asyncHandler(async (req, res) => {
 const getBook = asyncHandler(async (req, res) => {
     const id = req.params?.id
     const userObj = await User.findOne({ email: req.user }).select('email').lean().exec();
-    const book = await Book.findById(id).select().lean().populate({
-        path: 'category',
-        select:
-            'name',
-    });
+    const book = await Book.findById(id).select().lean().populate(
+        [{
+            path: 'category',
+            select:
+                'name',
+        }, {
+            path: 'author',
+            select:
+                'name description',
+        },
+        {
+            path: 'language',
+            select:
+                'name',
+        }
+        ]
+    );
     if (!book) {
         return res.status(400).json({
             message: "No Book Found",
@@ -72,7 +98,7 @@ const addBook = asyncHandler(async (req, res) => {
     const epubFile = (req.files['epub'] !== undefined) ? req.files['epub'][0] : null
     try {
 
-        const { title, author, description, category, isFree, price, publication_date } = req.body;
+        const { title, author, description, category, language, isFree, price, publication_date } = req.body;
 
 
         //handle some values
@@ -87,7 +113,7 @@ const addBook = asyncHandler(async (req, res) => {
             return res.status(400).json({ message: "Epub File Required", });
         }
         //confirm data
-        if (!title || !author || !description || !category) {
+        if (!title || !author || !description || !category || !language) {
             if (imageFile) {
                 await deleteFile(imageFile, imageFile.destination.replace('Public', ''))
             }
@@ -107,6 +133,16 @@ const addBook = asyncHandler(async (req, res) => {
             }
             return res.status(409).json({ message: "Book already exist!" });
         }
+        const authorData = await Author.findOne({ _id: author }).exec();
+        if (!authorData) {
+            if (imageFile) {
+                await deleteFile(imageFile, imageFile.destination.replace('Public', ''))
+            }
+            if (epubFile) {
+                await deleteFile(epubFile, epubFile.destination.replace('Public', ''))
+            }
+            return res.status(401).json({ message: "Author not exist!", });
+        }
         const categoryData = await Category.findOne({ _id: category }).exec();
         if (!categoryData) {
             if (imageFile) {
@@ -117,12 +153,23 @@ const addBook = asyncHandler(async (req, res) => {
             }
             return res.status(401).json({ message: "Category not exist!", });
         }
+        const languageData = await Language.findOne({ _id: language }).exec();
+        if (!languageData) {
+            if (imageFile) {
+                await deleteFile(imageFile, imageFile.destination.replace('Public', ''))
+            }
+            if (epubFile) {
+                await deleteFile(epubFile, epubFile.destination.replace('Public', ''))
+            }
+            return res.status(401).json({ message: "Language not exist!", });
+        }
 
         const bookObj = {
             title,
             author,
             description,
             category,
+            language,
             isFree: isFreeVal,
             price: isFreeVal ? 0 : priceVal,
             publication_date: dateVal,
@@ -165,12 +212,12 @@ const updateBook = asyncHandler(async (req, res) => {
     const epubFile = (req.files['epub'] !== undefined) ? req.files['epub'][0] : null
     try {
 
-        const { id, title, author, description, category, isFree, price, publication_date } = req.body;
+        const { id, title, author, description, category,language, isFree, price, publication_date } = req.body;
         const isFreeVal = isFree == "true";
         var priceVal = Number(price)
         const dateVal = new Date(publication_date)
         //confirm data
-        if (!id || !title || !author || !description || !category) {
+        if (!id || !title || !author || !description || !category|| !language) {
             if (imageFile) {
                 await deleteFile(imageFile, imageFile.destination.replace('Public', ''))
             }
@@ -206,8 +253,10 @@ const updateBook = asyncHandler(async (req, res) => {
             }
             return res.status(409).json({ message: "Book already Exist!" });
         }
+        const authorData = await Author.findOne({ _id: author }).exec();
         const categoryData = await Category.findOne({ _id: category }).exec();
-        if (!categoryData) {
+        const languageData = await Language.findOne({ _id: language }).exec();
+        if (!categoryData ||!authorData || !languageData) {
             if (imageFile) {
                 await deleteFile(imageFile, imageFile.destination.replace('Public', ''))
             }
@@ -220,6 +269,7 @@ const updateBook = asyncHandler(async (req, res) => {
         book.author = author;
         book.description = description;
         book.category = category;
+        book.language = language;
         book.isFree = isFreeVal;
         book.price = isFreeVal ? 0 : priceVal;
         book.publication_date = dateVal;

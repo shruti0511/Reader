@@ -40,6 +40,7 @@ const AddReview = ({ addReviewFun }) => {
                             rows={3}
                             onChange={handleReviewchange}
                         value={review}
+                        fullWidth
                         placeholder='Enter your review....'
                         />
                     </SoftBox>

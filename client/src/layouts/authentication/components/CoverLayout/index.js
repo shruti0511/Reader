@@ -95,7 +95,7 @@ function CoverLayout({ color, header, title, description, image, top, children }
           </SoftBox>
         </Grid>
       </Grid>
-      <Footer />
+      {/* <Footer /> */}
     </PageLayout>
   );
 }

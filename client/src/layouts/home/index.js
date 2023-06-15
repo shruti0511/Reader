@@ -5,9 +5,11 @@ import DashboardNavbar from 'examples/Navbars/DashboardNavbar'
 import React, { useEffect, useState } from 'react'
 import bookService from 'services/bookService'
 import Book from './component/Book'
+import FilterBox from './component/FilterBox'
 
 const HomePage = () => {
     const [books, setBooks] = useState([]);
+    const [allBooks, setAllBooks] = useState([]);
     useEffect(() => {
         getBooks()
 
@@ -20,6 +22,7 @@ const HomePage = () => {
                 if (response.status === 200) {
                     const books = response.data
                     setBooks(response.data);
+                    setAllBooks(response.data);
                 }
             })
             .catch((error) => {
@@ -38,10 +41,37 @@ const HomePage = () => {
                 }
             });
     }
+
+    const filterBooks = (authors, categories, languages) => {
+        let filteredBooks =allBooks
+        console.log(filteredBooks, "asd");
+        console.log(authors);
+        if (authors.length > 0) {
+            console.log('saa1');
+            filteredBooks = filteredBooks.filter(i => authors.includes(i.author._id ))
+            console.log(filteredBooks);
+        }
+        if (categories.length > 0) {
+            console.log('saa2');
+            filteredBooks = filteredBooks.filter(i =>  categories.includes(i.category._id))
+        }
+        if (languages.length > 0) {
+            console.log('saa3');
+            filteredBooks = filteredBooks.filter(i => languages.includes( i.language._id ))
+        }
+        console.log(filteredBooks,"filter");
+        setBooks(filteredBooks)
+
+    }
+    const resetBooks = () => {
+        console.log('yeah');
+        getBooks()
+    }
     return (
         <DashboardLayout>
-            <DashboardNavbar />
+            <DashboardNavbar navTitle="Home"/>
             <SoftBox py={3}>
+                <FilterBox filterBooks={filterBooks} resetBooks={resetBooks} />
                 <Grid container spacing={3}>
                     {books && books.map((book, index) => {
                         return <Book key={index} book={book} />

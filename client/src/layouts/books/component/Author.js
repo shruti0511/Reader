@@ -10,8 +10,8 @@ const Author = ({ image, name, email }) => {
       <SoftBox mr={2}>
         <SoftAvatar src={image} alt={name} size="sm" variant="rounded" />
       </SoftBox>
-      <SoftBox display="flex" flexDirection="column">
-        <SoftTypography variant="button" fontWeight="medium">
+      <SoftBox display="flex" flexDirection="column" maxWidth="400px">
+        <SoftTypography variant="button" fontWeight="medium" >
           {name}
         </SoftTypography>
         <SoftTypography variant="caption" color="secondary">
@@ -22,8 +22,8 @@ const Author = ({ image, name, email }) => {
   )
 }
 Author.propTypes = {
-    name: PropTypes.string.isRequired,
-    image: PropTypes.string,
-    email: PropTypes.string
+  name: PropTypes.string.isRequired,
+  image: PropTypes.string,
+  email: PropTypes.string
 };
 export default Author

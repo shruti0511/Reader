@@ -2,11 +2,29 @@ const Category = require("../models/Category");
 const asyncHandler = require("express-async-handler");
 const categoryImageHandle = require("../utils/uploadCategoryImage");
 const deleteFile = require("../utils/deleteFile");
+const Book = require("../models/Book");
 
 // @desc get all categories
 // @route GET/categories
 // @access private
 const getAllCategory = asyncHandler(async (req, res) => {
+    try {
+        const categories = await Category.find().sort('name').lean();
+        if (!categories) {
+            return res.status(400).json({
+                message: "No Category Found",
+            });
+        }
+        res.json(categories);
+    } catch (error) {
+        console.error("Error getAllCategory:", error);
+        res.status(500).json({ message: "Failed to get all category" });
+    }
+});
+// @desc get all categories with books
+// @route GET/categories
+// @access private
+const getCategoriesWithbook = asyncHandler(async (req, res) => {
     try {
         const categories = await Category.find().lean();
         if (!categories) {
@@ -14,7 +32,19 @@ const getAllCategory = asyncHandler(async (req, res) => {
                 message: "No Category Found",
             });
         }
-        res.json(categories);
+        const categoriesWithbooks = await Promise.all(
+            categories.map(async (category) => {
+                const books = await Book.find({ category: category._id }).select("title author image imagePath").sort('-createdAt').lean().populate({
+                        path: 'author',
+                        select:
+                            'name',
+                    }
+                );
+
+                return { ...category,books:books};
+            })
+        );
+        res.json(categoriesWithbooks);
     } catch (error) {
         console.error("Error getAllCategory:", error);
         res.status(500).json({ message: "Failed to get all category" });
@@ -152,4 +182,5 @@ module.exports = {
     addCategory,
     updateCategory,
     deleteCategory,
+    getCategoriesWithbook
 };

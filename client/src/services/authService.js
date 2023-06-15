@@ -14,6 +14,7 @@ const API_URL = "http://localhost:3500/";
 //     return response.data;
 //   });
 // };
+
 const verifyUser = async(data) => {
   return await axios.post(API_URL + "auth/confirm",data)
 };

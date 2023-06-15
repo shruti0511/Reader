@@ -7,7 +7,8 @@ const bookSchema = new mongoose.Schema(
       required: true,
     },
     author: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Author",
       required: true,
     },
     description: {
@@ -17,6 +18,11 @@ const bookSchema = new mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
+      required: true,
+    },
+    language: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Language",
       required: true,
     },
     isFree: {

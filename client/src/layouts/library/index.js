@@ -64,7 +64,7 @@ const MyLibrary = () => {
     }
     return (
         <DashboardLayout>
-            <DashboardNavbar />
+            <DashboardNavbar navTitle="Library"/>
 
             {
                 myBooks.length !== 0 ?

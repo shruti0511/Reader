@@ -4,12 +4,14 @@ import { useRefreshMutation } from "./authApiSlice"
 import { useSelector } from 'react-redux'
 import { selectCurrentToken } from "../authSlice"
 import usePersist from "hooks/usePersist"
+import jwtDecode from "jwt-decode"
 
 const PersistLogin = () => {
     const [persist] = usePersist()
     const token = useSelector(selectCurrentToken)
     const effectRan = useRef(false)
     const [trueSuccess, setTrueSuccess] = useState(false)
+    const [expires, setExpires] = useState(false)
 
     const [refresh, {
         isUninitialized,
@@ -64,9 +66,12 @@ const PersistLogin = () => {
         navigate("/authentication/sign-in")
 
     } else if (isSuccess && trueSuccess) { //persist: yes, token: yes
-        console.log('success')
         content = <Outlet />
     } else if (token && isUninitialized) { //persist: yes, token: yes
+        // const decodedToken: { exp: number } = jwt_decode(user?.accessToken);
+        // if (decodedToken.exp * 1000 < currentDate.getTime()) {
+
+        // }
         console.log('token and uninit')
         console.log(isUninitialized)
         content = <Outlet />

@@ -2,7 +2,7 @@ import { Box, Button, CardMedia, Grid, Typography } from '@mui/material';
 import SoftBox from 'components/SoftBox';
 import React from 'react'
 import Prototypes from 'prop-types'
-import defaultCategory from "assets/images/default-images/defaultCategory.jpg"
+import defaultBookImage from "assets/images/default-images/defaultBookImage.jpg"
 import SoftBadge from 'components/SoftBadge';
 import Ratings from './Ratings';
 
@@ -23,8 +23,8 @@ const styles = {
     p: 4,
 };
 const BookModal = ({ book, handleClose }) => {
-    var imageSrc = book.image ? process.env.REACT_APP_SERVER_API + book.imagePath + "/" + book.image : defaultCategory;
-    const avgRating = book.rating.reduce((a, {rating}) => a + rating, 0) / book.rating.length; 
+    var imageSrc = book.image ? process.env.REACT_APP_SERVER_API + book.imagePath + "/" + book.image : defaultBookImage;
+    const avgRating = book.rating.reduce((a, {rating}) => a + rating, 0) / book.rating.length;
     return (
         <Box sx={styles} className="bookModal">
             <Typography id="modal-modal-title" variant="h3">
@@ -61,7 +61,7 @@ const BookModal = ({ book, handleClose }) => {
             <Typography my={2} variant='body2'>
                 {book.description}
             </Typography>
-            
+
             {/* <AddRating/> */}
         </Box>
     )

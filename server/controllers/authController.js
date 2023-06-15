@@ -214,7 +214,7 @@ const reSendEmail = async (req, res) => {
             },
         },
         process.env.CONFIRMATION_SECRET,
-        { expiresIn: "15m" }
+        { expiresIn: "1d" }
     );
     user.confirmationCode = confirmationToken;
     const updatedUser = await user.save();

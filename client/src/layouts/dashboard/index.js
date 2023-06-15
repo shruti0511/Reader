@@ -50,7 +50,7 @@ function Dashboard() {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar />
+      <DashboardNavbar navTitle="Dashboard"/>
       <SoftBox py={3}>
         <SoftBox mb={3}>
           <Grid container spacing={3}>

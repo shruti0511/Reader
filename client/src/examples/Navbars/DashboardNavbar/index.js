@@ -46,7 +46,7 @@ import team2 from "assets/images/team-2.jpg";
 import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
 import { useSendLogoutMutation } from "redux/auth/authApiSlice";
 
-function DashboardNavbar({ absolute, light, isMini }) {
+function DashboardNavbar({ absolute, light, isMini,navTitle }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useSoftUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
@@ -148,7 +148,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
     >
       <Toolbar sx={(theme) => navbarContainer(theme)}>
         <SoftBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
-          <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
+          <Breadcrumbs icon="home" title={navTitle} route={route} light={light} />
         </SoftBox>
         {isMini ? null : (
           <SoftBox sx={(theme) => navbarRow(theme, { isMini })}>
@@ -160,7 +160,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
             </SoftBox>
             <SoftBox color={light ? "white" : "inherit"}>
               {/* <Link to="/authentication/sign-in"> */}
-                <IconButton sx={navbarIconButton} size="small">
+                <IconButton sx={navbarIconButton} size="small" onClick={onLogOutClicked}>
                   {/* <Icon
                     sx={({ palette: { dark, white } }) => ({
                       color: light ? white.main : dark.main,
@@ -172,7 +172,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     variant="button"
                     fontWeight="medium"
                     color={light ? "white" : "dark"}
-                    onClick={onLogOutClicked}
+
                   >
                     Logout
                   </SoftTypography>
@@ -222,6 +222,7 @@ DashboardNavbar.defaultProps = {
   absolute: false,
   light: false,
   isMini: false,
+  navTitle:'Reader'
 };
 
 // Typechecking props for the DashboardNavbar
@@ -229,6 +230,7 @@ DashboardNavbar.propTypes = {
   absolute: PropTypes.bool,
   light: PropTypes.bool,
   isMini: PropTypes.bool,
+  navTitle:PropTypes.string,
 };
 
 export default DashboardNavbar;

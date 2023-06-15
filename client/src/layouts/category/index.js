@@ -9,12 +9,9 @@ import SoftTypography from "components/SoftTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import Table from "examples/Tables/Table";
 
 // Data
-import authorsTableData from "layouts/tables/data/authorsTableData";
-import projectsTableData from "layouts/tables/data/projectsTableData";
-import { Box, CardContent, Grid, Modal, Typography } from "@mui/material";
+import { Box, Button, CardContent, Grid, Modal, Typography } from "@mui/material";
 import CategoryCard from "./components/CategoryCard";
 import PlaceholderCard from "examples/Cards/PlaceholderCard";
 import React, { useEffect, useState } from "react";
@@ -22,6 +19,7 @@ import categoryService from "services/categoryService";
 import AddUpdateCategory from "./components/AddUpdateCategory";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import BookList from "./components/BookList";
 
 const style = {
   position: "absolute",
@@ -36,9 +34,20 @@ const style = {
   p: 4,
 };
 
+const bookListStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 700,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  borderRadius: "10px",
+  boxShadow: 24,
+  p: 4,
+};
+
 function Category() {
-  const { columns, rows } = authorsTableData;
-  const { columns: prCols, rows: prRows } = projectsTableData;
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState('add');
   const [category, setCategory] = useState({});
@@ -46,13 +55,26 @@ function Category() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const [categoryBookList, setCategoryBookList] = useState([]);
+  const [categoryName, setCategoryName] = useState();
+  const [openBookListModal, setOpenBookListModal] = useState(false);
+
+  const handleOpenBookListModal = (books,category) => {
+    setCategoryBookList(books)
+    setCategoryName(category)
+    setOpenBookListModal(true)
+  };
+  const handleCloseBookListModal = () => setOpenBookListModal(false);
+
+
   useEffect(() => {
     getCategories();
   }, []);
 
   const getCategories = () => {
     categoryService
-      .getCategories()
+      .getCategorieswithBooks()
       .then((response) => {
         // setSuccessMsg(response.data.message)
         // setErrorMsg();
@@ -122,7 +144,7 @@ function Category() {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar />
+      <DashboardNavbar navTitle="Category"/>
       <SoftBox mb={3}>
         <Card >
           <SoftBox pt={2} px={2}>
@@ -148,33 +170,30 @@ function Category() {
                       title={category.name}
                       imagePath={category.imagePath}
                       deleteCategory={() => { deleteCategory(category._id) }}
-                      updateIcon={<EditIcon color="info" onClick={()=>{openUpdateModal(category)}} />}
+                      updateIcon={<EditIcon color="info" onClick={() => { openUpdateModal(category) }} />}
                       deleteIcon={<DeleteIcon color="error" onClick={() => { deleteCategory(category._id) }} />}
-                    // image={homeDecor1}
-                    //label="project #2"
-                    // title="modern"
-                    // description="As Uber works through a huge amount of internal management turmoil."
-                    // action={{
-                    //   color: "error",
-                    //   label: "Delete",
-                    //   icon: <EmailIcon fontSize="large"/>
-                    // }}
-                    // updateAction={{
-                    //   color: "info",
-                    //   label: "Update",
-                    //   icon: <EmailIcon fontSize="large"/>
-                    // }}
+                      // image={homeDecor1}
+                      //label="project #2"
+                      // title="modern"
+                      // description="As Uber works through a huge amount of internal management turmoil."
+                      action={{
+                        color: "info",
+                        label: "Show Books List",
 
-                    // authors={[
-                    //   { image: team1, name: "Elena Morison" },
-                    //   { image: team2, name: "Ryan Milly" },
-                    //   { image: team3, name: "Nick Daniel" },
-                    //   { image: team4, name: "Peterson" },
-                    // ]}
+                      }}
+                      openModalList = {()=>{handleOpenBookListModal(category.books,category.name)}}
+
+                      // authors={[
+                      //   { image: team1, name: "Elena Morison" },
+                      //   { image: team2, name: "Ryan Milly" },
+                      //   { image: team3, name: "Nick Daniel" },
+                      //   { image: team4, name: "Peterson" },
+                      // ]}
+                      authors={category.books.slice(0,4) }
                     />
                   );
                 })}
-              <Grid item xs={12} md={6} xl={2} onClick={openAddModal}>
+              <Grid item xs={12} md={4} xl={3} xxl={3} onClick={openAddModal}>
                 <PlaceholderCard
                   title={{ variant: "h5", text: "New Category" }}
                   sx={{ maxHeight: "250px" }}
@@ -201,10 +220,30 @@ function Category() {
           </Typography> */}
             <Card variant="outlined">
               <CardContent>
-                <AddUpdateCategory close={addCategorySuccess} status={status} category={category}/>
+                <AddUpdateCategory close={addCategorySuccess} status={status} category={category} />
               </CardContent>
             </Card>
           </Box>
+        </Modal>
+        <Modal
+          open={openBookListModal}
+          onClose={handleCloseBookListModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <SoftBox sx={bookListStyle} display="flex" flexDirection="column" justifyContent="space-between">
+            <SoftTypography id="modal-modal-title" variant="h4" >
+              {categoryName}
+              <Button onClick={handleCloseBookListModal} sx={{float:'right'}}>x</Button>
+          </SoftTypography>
+
+            <Card variant="outlined">
+              <CardContent>
+                {/* <AddUpdateCategory close={addCategorySuccess} status={status} category={category} /> */}
+                <BookList books={ categoryBookList} />
+              </CardContent>
+            </Card>
+          </SoftBox>
         </Modal>
       </SoftBox>
       <Footer />

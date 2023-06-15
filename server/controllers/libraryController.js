@@ -8,15 +8,22 @@ const User = require("../models/User");
 // @access private
 const getUserLibrary = asyncHandler(async (req, res) => {
     try {
-        const user = await User.findOne({ email:req.user }).select("email").lean().exec()
-        const userBooks = await Library.find({user:user._id}).sort('-createdAt').lean().populate({
-            path: 'book' });
-         if (!userBooks) {
-             return res.status(400).json({
-                 message: "No Book in Library",
+        const user = await User.findOne({ email: req.user }).select("email").lean().exec()
+        const userBooks = await Library.find({ user: user._id }).sort('-createdAt').lean()
+            .populate({
+                path: 'book',
+                populate: {
+                    path: 'author',
+                    select:
+                        'name',
+                },
             });
-         }
-         res.json(userBooks);
+        if (!userBooks) {
+            return res.status(400).json({
+                message: "No Book in Library",
+            });
+        }
+        res.json(userBooks);
     } catch (error) {
         console.error("Error getUserLibrary:", error);
         res.status(500).json({ message: "Failed to get Library data" });
@@ -29,12 +36,12 @@ const getUserLibrary = asyncHandler(async (req, res) => {
 // @access private
 const addLibrary = asyncHandler(async (req, res) => {
     try {
-        const { book} = req.body;
+        const { book } = req.body;
         const email = req.user;
-        if ( !email ||!book) {
+        if (!email || !book) {
             return res.status(400).json({ message: "Fields are required", });
         }
-        const userobj = await User.findOne({ email:email }).lean().exec()
+        const userobj = await User.findOne({ email: email }).lean().exec()
         if (!userobj) {
             return res.status(409).json({ message: "User not exist!" });
         }
@@ -43,13 +50,13 @@ const addLibrary = asyncHandler(async (req, res) => {
             return res.status(409).json({ message: "Book not exist!" });
         }
         //check for duplicates
-        const duplicate = await Library.findOne({ user:userobj._id,book }).lean().exec();
+        const duplicate = await Library.findOne({ user: userobj._id, book }).lean().exec();
         if (duplicate) {
 
             return res.status(200).json({ message: "Book already in Library!" });
         }
         const library = {
-            user:userobj._id,
+            user: userobj._id,
             book
         };
         //create and store rating
@@ -83,7 +90,7 @@ const removeFromLibrary = asyncHandler(async (req, res) => {
         }
         const result = await library.deleteOne();
 
-        res.status(200).json({ message:`Book removed suceessfully from library` });
+        res.status(200).json({ message: `Book removed suceessfully from library` });
 
     } catch (error) {
 

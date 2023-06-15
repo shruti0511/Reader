@@ -1,10 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-// react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
-
-// @mui material components
 
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
@@ -17,13 +14,12 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 
 // Images
 import curved9 from "assets/images/curved-images/curved-6.jpg";
+
 import { useLoginMutation } from "redux/auth/authApiSlice";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "redux/authSlice";
 import usePersist from "hooks/usePersist";
 import { Grid, Switch } from "@mui/material";
-import useAuth from "hooks/useAuth";
-import GoogleLogin from "react-google-login";
 import Socials from "../components/Socials";
 
 function SignIn() {
@@ -36,7 +32,7 @@ function SignIn() {
   const [error, setError] = useState(null);
   const handleSetPersist = () => setPersist(!persist);
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [login] = useLoginMutation();
 
   useEffect(() => {
     userRef.current.focus();
@@ -51,7 +47,7 @@ function SignIn() {
 
   return (
     <CoverLayout
-      title="Welcome back"
+      title="Welcome"
       description="Enter your email and password to sign in"
       image={curved9}
     >
@@ -153,39 +149,9 @@ function SignIn() {
             </SoftBox>
             <SoftBox mt={4} mb={1}>
               <SoftButton variant="gradient" color="info" fullWidth type="submit">
-                sign in
+                Sign in
               </SoftButton>
             </SoftBox>
-            {/* <SoftBox textAlign="right">
-
-
-                <SoftTypography
-                  component={Link}
-                  to="/authentication/sign-up"
-                  variant="button"
-                  color="info"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  Forgot Password?
-                </SoftTypography>
-
-            </SoftBox>
-            <SoftBox textAlign="center">
-              <SoftTypography variant="button" color="text" fontWeight="regular">
-                Don&apos;t have an account?{" "}
-                <SoftTypography
-                  component={Link}
-                  to="/authentication/sign-up"
-                  variant="button"
-                  color="info"
-                  fontWeight="medium"
-                  textGradient
-                >
-                  Sign up
-                </SoftTypography>
-              </SoftTypography>
-            </SoftBox> */}
 
             <Grid container spacing={3}>
               <Grid item xs={12} md={6} xl={6}>

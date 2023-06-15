@@ -12,16 +12,15 @@ import Footer from "examples/Footer";
 import Table from "examples/Tables/Table";
 
 // Data
-import projectsTableData from "layouts/books/component/projectsTableData";
 import SoftButton from "components/SoftButton";
-import { Modal, Box, CardContent, Grid, Alert, Collapse, IconButton } from "@mui/material";
+import { Modal, Box, CardContent, Alert, Collapse, IconButton, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddBook from "./component/AddBook";
 import bookService from "services/bookService";
 import Author from "./component/Author";
 import Function from "./component/Function";
 import SoftBadge from "components/SoftBadge";
-import defaultCategory from "assets/images/default-images/defaultCategory.jpg";
+import defaultBookImage from "assets/images/default-images/defaultBookImage.jpg";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
@@ -49,6 +48,7 @@ function Books() {
         { name: "category", align: "center" },
         { name: "rating", align: "center" },
         { name: "price", align: "center" },
+        { name: "language", align: "center" },
         { name: "Released Date", align: "center" },
         { name: "action", align: "center" },
     ]
@@ -91,12 +91,12 @@ function Books() {
                 if (response.status === 200) {
                     const books = response.data
                     const rowData = books.map((item) => {
-                        var imageSrc = item.image ? process.env.REACT_APP_SERVER_API + item.imagePath + "/" + item.image : defaultCategory;
+                        var imageSrc = item.image ? process.env.REACT_APP_SERVER_API + item.imagePath + "/" + item.image : defaultBookImage;
                         var publicationDate = new Date(item.publication_date)
                         return (
                             {
                                 title: (<Author image={imageSrc} name={item.title} />),
-                                author: (<Function job={item.author} />),
+                                author: (<Function job={item.author.name} />),
                                 category: (
                                     <SoftBadge variant="gradient" badgeContent={item.category.name} color="success" size="xs" container />
                                 ),
@@ -110,6 +110,9 @@ function Books() {
                                 ),
                                 price: (
                                     <SoftTypography variant="caption">Rs. {item.price}</SoftTypography>
+                                ),
+                                language: (
+                                    <SoftTypography variant="caption">{item.language.name}</SoftTypography>
                                 ),
                                 action: (
                                     <>
@@ -180,7 +183,7 @@ function Books() {
 
     return (
         <DashboardLayout>
-            <DashboardNavbar />
+            <DashboardNavbar navTitle="Books"/>
             <SoftBox py={3}>
                 <SoftBox mb={3}>
                     <Card>
@@ -193,40 +196,54 @@ function Books() {
                             >
                                 Add Book
                             </SoftButton>
+
+
                         </SoftBox>
-                        <SoftBox
-                            sx={{
-                                "& .MuiTableRow-root:not(:last-child)": {
-                                    "& td": {
-                                        borderBottom: ({ borders: { borderWidth, borderColor } }) =>
-                                            `${borderWidth[1]} solid ${borderColor}`,
+                        {books.length !== 0
+                            ?
+                            <SoftBox
+                                sx={{
+                                    "& .MuiTableRow-root:not(:last-child)": {
+                                        "& td": {
+                                            borderBottom: ({ borders: { borderWidth, borderColor } }) =>
+                                                `${borderWidth[1]} solid ${borderColor}`,
+                                        },
                                     },
-                                },
-                            }}
-                        >
-                            <SoftBox display="flex" justifyContent="center" alignItems="center" p={3}>
-                                <Collapse in={alert}>
-                                    <Alert
-                                        action={
-                                            <IconButton
-                                                aria-label="close"
-                                                color="inherit"
-                                                size="small"
-                                                onClick={() => {
-                                                    setAlert(false);
-                                                }}
-                                            >
-                                                <CloseIcon fontSize="inherit" />
-                                            </IconButton>
-                                        }
-                                        sx={{ mb: 2, width: '1000px' }}
-                                    >
-                                        {successMsg ? successMsg : "Task Complete successfully!"}
-                                    </Alert>
-                                </Collapse>
+                                }}
+                            >
+
+                                <SoftBox display="flex" justifyContent="center" alignItems="center" p={3}>
+                                    <Collapse in={alert}>
+                                        <Alert
+                                            action={
+                                                <IconButton
+                                                    aria-label="close"
+                                                    color="inherit"
+                                                    size="small"
+                                                    onClick={() => {
+                                                        setAlert(false);
+                                                    }}
+                                                >
+                                                    <CloseIcon fontSize="inherit" />
+                                                </IconButton>
+                                            }
+                                            sx={{ mb: 2, width: '1000px' }}
+                                        >
+                                            {successMsg ? successMsg : "Task Complete successfully!"}
+                                        </Alert>
+                                    </Collapse>
+                                </SoftBox>
+
+
+                                <Table columns={columns} rows={books} />
+
+
+
                             </SoftBox>
-                            <Table columns={columns} rows={books} />
-                        </SoftBox>
+                            : <Stack spacing={2} textAlign="center" mb={3}>
+                                No Book Available
+                            </Stack>
+                        }
                     </Card>
                 </SoftBox>
                 <Modal
@@ -237,13 +254,13 @@ function Books() {
                 >
                     <Box sx={style}>
                         {/* <Typography id="modal-modal-title" variant="h6" component="h2">
-              Modal Header
-              <Button onClick={handleClose}>x</Button>
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Modal content
+                                Modal Header
+                                <Button onClick={handleClose}>x</Button>
+                            </Typography>
+                            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                                Modal content
 
-          </Typography> */}
+                            </Typography> */}
                         <Card variant="outlined">
                             <CardContent>
                                 <AddBook status={status} closeModal={closeModal} book={book} />

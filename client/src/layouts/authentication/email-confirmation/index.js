@@ -20,7 +20,6 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 // Images
 import curved6 from "assets/images/curved-images/curved14.jpg";
 import authService from "services/authService";
-import { Button } from "@mui/material";
 
 function EmailConfirmation() {
   const [emailConfirmed, setEmailConfirmed] = useState(false);

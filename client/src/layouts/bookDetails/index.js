@@ -10,7 +10,7 @@ import SoftTypography from 'components/SoftTypography';
 import Ratings from 'layouts/component/Ratings';
 import ReadOrBuyButton from 'layouts/component/ReadOrBuyButton';
 import SoftBadge from 'components/SoftBadge';
-import defaultCategory from "assets/images/default-images/defaultCategory.jpg"
+import defaultBookImage from "assets/images/default-images/defaultBookImage.jpg"
 import UserReview from 'layouts/component/UserReview';
 import AddReview from 'layouts/component/AddReview';
 import ReviewBox from 'layouts/component/ReviewBox';
@@ -57,35 +57,34 @@ const BookDetails = () => {
       book: book._id
     }
 
-      ratingService.addRating(obj)
-        .then((response) => {
-          if (response.status === 200) {
-            getBookDetails()
-          }
-        })
-        .catch((error) => {
-          // error is handled in catch block
-          if (error.response) {
-            // status code out of the range of 2xx
-            console.log("Data :", error.response.data);
-            console.log("Status :" + error.response.status);
-            //}
-          } else if (error.request) {
-            // The request was made but no response was received
-            console.log(error.request);
-          } else {
-            // Error on setting up the request
-            console.log("Error", error.message);
-          }
-        });
+    ratingService.addRating(obj)
+      .then((response) => {
+        if (response.status === 200) {
+          getBookDetails()
+        }
+      })
+      .catch((error) => {
+        // error is handled in catch block
+        if (error.response) {
+          // status code out of the range of 2xx
+          console.log("Data :", error.response.data);
+          console.log("Status :" + error.response.status);
+          //}
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.log(error.request);
+        } else {
+          // Error on setting up the request
+          console.log("Error", error.message);
+        }
+      });
 
   }
 
   return (
     <DashboardLayout>
-      <DashboardNavbar />
+      <DashboardNavbar navTitle="Book Detail"/>
       {book &&
-        // <BookView book={book} submitReview={submitReview} />
         <Box >
           <Grid container mt={5}>
             <Grid item xs={12} md={4} xl={3} xxl={2}>
@@ -96,7 +95,7 @@ const BookDetails = () => {
                 borderRadius="lg"
 
               >
-                <SoftBox component="img" src={book.image ? process.env.REACT_APP_SERVER_API + book.imagePath + "/" + book.image : defaultCategory} alt="rocket" width="180px" ml={2} />
+                <SoftBox component="img" src={book.image ? process.env.REACT_APP_SERVER_API + book.imagePath + "/" + book.image : defaultBookImage} alt="rocket" width="180px" ml={2} />
               </SoftBox>
             </Grid>
             <Grid item xs={12} md={8} xl={9} xxl={10}>
@@ -104,7 +103,7 @@ const BookDetails = () => {
                 {book.title}
               </SoftTypography>
               <SoftTypography variant="body1" color="text" fontWeight="medium" mb={0.5}>
-                {book.author}
+                {book.author.name}
               </SoftTypography>
               <SoftTypography variant="body2" color="text" fontWeight="medium" mb={1}>
                 Released {new Date(book.publication_date).toDateString()}
@@ -127,18 +126,33 @@ const BookDetails = () => {
             <SoftTypography mb={2} variant='body2'>
               {book.description}
             </SoftTypography>
+
+
+
+            {/* <Divider variant="inset" /> */}
+            <SoftTypography mb={2} variant='body2'>
+              <b>Language:</b> {book.language.name}
+            </SoftTypography>
+            <Divider variant="inset" />
+            <SoftTypography variant="h4" color="text" fontWeight="medium">
+              About the Author
+            </SoftTypography>
+            {/* <Divider variant="inset" /> */}
+            <SoftTypography mb={2} variant='body2'>
+              {book.author.description}
+            </SoftTypography>
             <Divider variant="inset" />
             <SoftTypography variant="h4" color="text" fontWeight="medium" mt={2} mb={1}>
-                Reviews
+              Reviews
             </SoftTypography>
             {book.userRating
               ? <UserReview userReview={book.userRating} getBookDetails={getBookDetails} />
-              : <AddReview addReviewFun={ addReview} />
+              : <AddReview addReviewFun={addReview} />
             }
             {
-                book.ratings.map((review, index) =>
-                    <ReviewBox review={review} key={index}/>
-                )
+              book.ratings.map((review, index) =>
+                <ReviewBox review={review} key={index} />
+              )
             }
 
 

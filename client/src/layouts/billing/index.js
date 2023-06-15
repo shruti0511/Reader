@@ -21,7 +21,7 @@ import SoftBox from "components/SoftBox";
 
 // Soft UI Dashboard React components
 import MasterCard from "examples/Cards/MasterCard";
-import DefaultInfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
+import InfoCard from "examples/Cards/InfoCards/DefaultInfoCard";
 
 // Soft UI Dashboard React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";

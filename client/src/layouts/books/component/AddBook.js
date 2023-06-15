@@ -1,21 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Field, Formik } from "formik";
+import {  Formik } from "formik";
 import * as Yup from "yup";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
-import categoryService from "services/categoryService";
 import PropTypes from "prop-types";
-import { CardMedia, Checkbox, FormControl, Grid, InputLabel, MenuItem, OutlinedInput, Select } from "@mui/material";
-import defaultCategory from "assets/images/default-images/defaultCategory.jpg";
+import { Checkbox, FormControl, Grid, MenuItem, Select } from "@mui/material";
 import bookService from "services/bookService";
+import useCategories from "hooks/useCategory";
+import useAuthors from "hooks/useAuthors";
+import useLanguages from "hooks/useLanguage";
 const SUPPORTED_FORMATS = [
     "image/jpeg", "image/jpg", "image/png"
 ];
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+    //   width: 250,
+    },
+  },
+};
+
+
+
 const AddBook = ({ status, closeModal, book }) => {
     const [isFree, setIsFree] = useState(false);
-    const [categories, setCategories] = useState([]);
 
     const handleIsFree = () => setIsFree(!isFree);
     const addValidation = Yup.object().shape({
@@ -23,6 +36,7 @@ const AddBook = ({ status, closeModal, book }) => {
         author: Yup.string().required("Book Author is required"),
         description: Yup.string().required("Book Description is required"),
         category: Yup.string().required("Category is required"),
+        language: Yup.string().required("Language is required"),
         image: Yup.mixed()
             .test(
                 "fileFormat",
@@ -57,6 +71,7 @@ const AddBook = ({ status, closeModal, book }) => {
         author: Yup.string().required("Book Author is required"),
         description: Yup.string().required("Book Description is required"),
         category: Yup.string().required("Category is required"),
+        language: Yup.string().required("Language is required"),
         price: Yup.string()
             .when("isFree", (isFree, schema) =>
                 !isFree ? Yup.string().required() : schema
@@ -86,49 +101,39 @@ const AddBook = ({ status, closeModal, book }) => {
 
     });
     const [error, setError] = useState("");
-    const [categorySelect, setCategorySelect] = useState("");
+    const [categorySelect, setCategorySelect] = useState(0);
+    const [authorSelect, setAuthorSelect] = useState(0)
+    const [languageSelect, setLanguageSelect] = useState(0)
+
+    const {
+        status: categoryStatus,
+        data: categoryData
+    } = useCategories()
+
+    const {
+        status: languageStatus,
+        data: languageData
+    } = useLanguages()
+
+    const {
+        status: authorStatus,
+        data: authorData
+    } = useAuthors()
 
     useEffect(() => {
-        getCategories()
+        // getCategories()
+
+
         if (Object.keys(book).length !== 0) {
             setIsFree(book.isFree)
             setCategorySelect(book.category._id)
+            setAuthorSelect(book.author._id)
+            setLanguageSelect(book.language._id)
         }
 
 
-    }, [])
+    }, [categoryStatus, categoryData, languageStatus, languageData, authorStatus, authorData])
 
-    const getCategories = () => {
-        categoryService
-            .getCategories()
-            .then((response) => {
-                // setSuccessMsg(response.data.message)
-                // setErrorMsg();
-                // setEmailConfirmed(true)
-                if (response.status === 200) {
-                    setCategories(response.data);
-                }
-            })
-            .catch((error) => {
-                // error is handled in catch block
-                if (error.response) {
-                    // status code out of the range of 2xx
-                    console.log("Data :", error.response.data);
-                    console.log("Status :" + error.response.status);
-                    //  if (error.response.status === 403) {
-                    // setLinkExpired(true)
-                    // setErrorMsg(error.response.data.message);
-                    // setSuccessMsg();
-                    //}
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    console.log(error.request);
-                } else {
-                    // Error on setting up the request
-                    console.log("Error", error.message);
-                }
-            });
-    };
     const addBookFun = (data) => {
         bookService
             .addBook(data)
@@ -192,6 +197,7 @@ const AddBook = ({ status, closeModal, book }) => {
                     author: "",
                     description: "",
                     category: "",
+                    language: "",
                     isFree: isFree,
                     price: "",
                     publication_date: "",
@@ -200,9 +206,10 @@ const AddBook = ({ status, closeModal, book }) => {
                 } :
                 {
                     title: book.title,
-                    author: book.author,
+                    author: book.author._id,
                     description: book.description,
                     category: book.category._id,
+                    language: book.language._id,
                     isFree: book.isFree,
                     price: book.price,
                     publication_date: book.publication_date,
@@ -254,7 +261,7 @@ const AddBook = ({ status, closeModal, book }) => {
 
                         {/* {status !== "add" &&
                         <CardMedia
-                        src={defaultCategory}
+                        src={default}
                         component="img"
                         title={'title'}
                         sx={{
@@ -291,7 +298,7 @@ const AddBook = ({ status, closeModal, book }) => {
                                     ) : null}
                                 </SoftBox>
                             </Grid>
-                            <Grid item xs={12} md={6} xl={6}>
+                            {/* <Grid item xs={12} md={6} xl={6}>
                                 <SoftBox>
                                     <SoftBox mb={1} ml={0.5}>
                                         <SoftTypography component="label" variant="caption" fontWeight="bold">
@@ -306,6 +313,50 @@ const AddBook = ({ status, closeModal, book }) => {
                                         onBlur={handleBlur}
                                         value={values.author}
                                     />
+                                    {errors.author && touched.author ? (
+                                        <SoftTypography variant="caption" color="error">
+                                            {errors.author}
+                                        </SoftTypography>
+                                    ) : null}
+                                </SoftBox>
+                            </Grid> */}
+                            <Grid item xs={12} md={6} xl={6}>
+                                <SoftBox>
+                                    <SoftBox mb={1} ml={0.5}>
+                                        <SoftTypography component="label" variant="caption" fontWeight="bold">
+                                            Book Author
+                                        </SoftTypography>
+                                    </SoftBox>
+
+                                    <FormControl fullWidth>
+                                        <Select
+                                            value={authorSelect}
+                                            onChange={(event) => {
+                                                setAuthorSelect(event.target.value);
+                                                setFieldValue("author", event.target.value);
+                                            }}
+                                            autoWidth
+                                            label="Author"
+                                            name="author"
+                                            MenuProps={MenuProps}
+                                        >
+                                            <MenuItem
+                                                key={0}
+                                                value={0}
+                                            >
+                                                Select Author
+                                            </MenuItem>
+                                            {authorData.map((author, index) => (
+                                                <MenuItem
+                                                    key={index + 1}
+                                                    value={author._id}
+                                                >
+                                                    {author.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+
+                                    </FormControl>
                                     {errors.author && touched.author ? (
                                         <SoftTypography variant="caption" color="error">
                                             {errors.author}
@@ -342,24 +393,9 @@ const AddBook = ({ status, closeModal, book }) => {
                                             Book Category
                                         </SoftTypography>
                                     </SoftBox>
-                                    {/* <SoftInput
-                                    type="text"
-                                    placeholder="Book Category"
-                                    name="category"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.category}
-                                />
-                                {errors.category && touched.category ? (
-                                    <SoftTypography variant="caption" color="error">
-                                        {errors.category}
-                                    </SoftTypography>
-                                ) : null} */}
+
                                     <FormControl fullWidth>
-                                        {/* <InputLabel id="demo-simple-select-label">Category</InputLabel> */}
                                         <Select
-                                            labelId="demo-simple-select-autowidth-label"
-                                            id="demo-simple-select-autowidth"
                                             value={categorySelect}
                                             onChange={(event) => {
                                                 setCategorySelect(event.target.value);
@@ -368,21 +404,74 @@ const AddBook = ({ status, closeModal, book }) => {
                                             autoWidth
                                             label="Category"
                                             name="category"
-                                        >
+                                            MenuProps={MenuProps}
 
-                                            {categories.map((category, index) => (
+                                        >
+                                            <MenuItem
+                                                key={0}
+                                                value={0}
+                                            >
+                                                Select Category
+                                            </MenuItem>
+                                            {categoryData.map((category, index) => (
                                                 <MenuItem
-                                                    key={index}
+                                                    key={index + 1}
                                                     value={category._id}
                                                 >
                                                     {category.name}
                                                 </MenuItem>
                                             ))}
                                         </Select>
+
                                     </FormControl>
                                     {errors.category && touched.category ? (
                                         <SoftTypography variant="caption" color="error">
                                             {errors.category}
+                                        </SoftTypography>
+                                    ) : null}
+                                </SoftBox>
+                            </Grid>
+                            <Grid item xs={12} md={6} xl={6}>
+                                <SoftBox>
+                                    <SoftBox mb={1} ml={0.5}>
+                                        <SoftTypography component="label" variant="caption" fontWeight="bold">
+                                            Book Language
+                                        </SoftTypography>
+                                    </SoftBox>
+
+                                    <FormControl fullWidth>
+                                        <Select
+                                            value={languageSelect}
+                                            onChange={(event) => {
+                                                setLanguageSelect(event.target.value);
+                                                setFieldValue("language", event.target.value);
+                                            }}
+                                            autoWidth
+                                            label="Language"
+                                            name="language"
+                                            MenuProps={MenuProps}
+
+                                        >
+                                            <MenuItem
+                                                key={0}
+                                                value={0}
+                                            >
+                                                Select Language
+                                            </MenuItem>
+                                            {languageData.map((language, index) => (
+                                                <MenuItem
+                                                    key={index + 1}
+                                                    value={language._id}
+                                                >
+                                                    {language.name}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+
+                                    </FormControl>
+                                    {errors.language && touched.language ? (
+                                        <SoftTypography variant="caption" color="error">
+                                            {errors.language}
                                         </SoftTypography>
                                     ) : null}
                                 </SoftBox>
@@ -413,7 +502,7 @@ const AddBook = ({ status, closeModal, book }) => {
 
                                             <Checkbox checked={isFree} onChange={(event) => {
                                                 handleIsFree();
-                                                setFieldValue("isFree",!isFree);
+                                                setFieldValue("isFree", !isFree);
                                             }} />
                                         </Grid>
                                         {!isFree &&

@@ -3,7 +3,7 @@ import SoftBox from 'components/SoftBox'
 import SoftTypography from 'components/SoftTypography'
 import React, {  useState } from 'react'
 import PropTypes from "prop-types"
-import defaultCategory from "assets/images/default-images/defaultCategory.jpg"
+import defaultBookImage from "assets/images/default-images/defaultBookImage.jpg"
 import Ratings from '../../component/Ratings';
 import { useNavigate } from 'react-router-dom'
 import ReadOrBuyButton from '../../component/ReadOrBuyButton'
@@ -16,7 +16,7 @@ const Book = ({ book }) => {
         navigate(`/bookDetail/${book._id}`)
     }
 
-    var imageSrc = book.image ? process.env.REACT_APP_SERVER_API + book.imagePath + "/" + book.image : defaultCategory;
+    var imageSrc = book.image ? process.env.REACT_APP_SERVER_API + book.imagePath + "/" + book.image : defaultBookImage;
     //const avgRating = book.rating.reduce((a, { rating }) => a + rating, 0) / book.rating.length;
     const Released_date = new Date(book.publication_date)
     return (
@@ -34,22 +34,20 @@ const Book = ({ book }) => {
                                     // bgColor="info"
                                     borderRadius="lg"
                                     variant="gradient"
-
                                     ml={2}
-
                                 >
-                                    <SoftBox component="img" src={imageSrc} alt="rocket" width="140px" m={1} sx={{maxHeight:'200px', minHeight:'200px'}}/>
+                                    <SoftBox component="img" src={imageSrc} alt="rocket" width="140px" m={1} sx={{maxHeight:'230px', minHeight:'230px'}}/>
                                 </SoftBox>
 
                             </Grid >
                             <Grid item xs={12} lg={6} xl={7} sx={{ position: "relative" }}>
                                 <SoftBox display="flex" flexDirection="column" height="100%" ml={1}>
-                                    <SoftTypography variant="h4" fontWeight="bold" >
+                                    <SoftTypography variant="h4" fontWeight="bold">
                                         {book.title}
                                     </SoftTypography>
                                     <SoftBox pt={1} mb={1}>
                                         <SoftTypography variant="body2" color="text" fontWeight="medium">
-                                            {book.author}
+                                            {book.author.name}
                                         </SoftTypography>
                                     </SoftBox>
                                     <SoftBox display="flex" flexDirection="row" >
