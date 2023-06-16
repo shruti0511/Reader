@@ -1,5 +1,5 @@
 # Reader(EPUB Reader)-MERN-STACK Project
-Readder is Application for epub reader. Reader is an application built on nodejs, reactjs and mongodb. Which has books available to read for users and functionality to create a library. It also has OAuth of google and secure authentication.
+Reader is Application for epub reader. Reader is an application built on nodejs, reactjs and mongodb. Which has books available to read for users and functionality to create a library. It also has OAuth of google and secure authentication.
 
 # Functionalities
 * Authentication
