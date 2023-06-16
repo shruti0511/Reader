@@ -5,9 +5,6 @@ import PropTypes from 'prop-types'
 import { Grid, Typography } from '@mui/material';
 
 const Ratings = ({ ratings }) => {
-
-
-
     return (
         <>
             <Grid container>
