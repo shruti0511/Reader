@@ -60,7 +60,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
-    "install:peer-deps": "npm install --legacy-peer-deps"
+    "install:peer-deps": "npm install --save-dev eslint-config-prettier"
   },
   "eslintConfig": {
     "extends": [
