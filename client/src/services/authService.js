@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3500/";
+const API_URL = process.env.REACT_APP_SERVER_API;
 
 // const verifyUser = (code) => {
 //     return axios.get(API_URL + "auth/confirm/" + code).then((response) => {
