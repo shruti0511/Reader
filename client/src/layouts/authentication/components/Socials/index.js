@@ -52,7 +52,7 @@ function Socials() {
       } else {
         console.log(error?.data?.message);
       }
-      errRef.current.focus();
+      // errRef.current.focus();
     }
   };
   const responseGoogleError = (response) => {
