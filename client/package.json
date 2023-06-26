@@ -29,7 +29,7 @@
     "@testing-library/react": "13.3.0",
     "@testing-library/user-event": "14.2.1",
     "axios": "^1.4.0",
-    "chart.js": "^4.3.0",
+    "chart.js": "3.4.1",
     "chroma-js": "2.4.2",
     "formik": "^2.2.9",
     "gapi-script": "^1.2.0",
@@ -59,8 +59,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install  && npm start",
-    "install:peer-deps": "npm install --save-dev eslint-config-prettier"
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
+    "install:peer-deps": "npm install --legacy-peer-deps"
   },
   "eslintConfig": {
     "extends": [
@@ -82,7 +82,7 @@
   },
   "devDependencies": {
     "eslint": "8.18.0",
-    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-prettier": "8.5.0",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-react": "7.30.1",
